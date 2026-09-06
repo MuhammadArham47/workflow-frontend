@@ -130,15 +130,34 @@ function AuthPage() {
     }, 1400);
   };
 
-  const handleSubmit = (e) => {
+/**
+ * 处理表单提交事件的函数
+ * @param {Object} e - 事件对象
+ */
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // if (!validate()) return;
     console.log(mode);
     // if (mode === "signup") {
       
-    // } else if (mode === "login") {
-      
-    // }
+    // } else
+       if (mode === "login") {
+      if (!email || !password) {
+        toast.error("Email and password are required");
+        return;
+      }
+        const data = {name, email, password};
+        const res = await loginUser(data);
+
+        if (res.success) {
+          toast.success("Login successful");
+          if (res.data.name === "admin") {
+            navigate("/dashboard/adminDashboard");
+          } else {
+            navigate("/dashboard/userDashboard")
+          }
+        };
+    }
     // simulateLogin(mode === "signup" ? name : email.split("@").at(0) ?? "Demo User");
   };
 

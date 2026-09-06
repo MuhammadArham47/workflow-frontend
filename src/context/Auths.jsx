@@ -29,7 +29,7 @@ const Auths = ({ children }) => {
   const registerUser = async (userData) => {
           try {
   
-              const response = await axios.post(`${VITE_BASE_URL}/api/auth/usercreate`, userData);
+              const response = await axios.post(`http://localhost:8000/api/auth/usercreate`, userData);
   
               const { success, message, isError } = response.data;
   
@@ -48,7 +48,7 @@ const Auths = ({ children }) => {
       const loginUser = async (userData) => {
               try {
       
-                  const response = await axios.post(`${VITE_BASE_URL}/api/auth/userlogin`, userData);
+                  const response = await axios.post(`http://localhost:8000/api/auth/userlogin`, userData);
       
                   const { success, message, isError, data } = response.data;
       
@@ -59,7 +59,7 @@ const Auths = ({ children }) => {
                   }
       
                   if (success) {
-                      localStorage.setItem('token', token);
+                      // localStorage.setItem('token', token);
                       dispatch({ type: 'SET_LOGIN', payload: { user: data } });
                   }
       
