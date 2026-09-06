@@ -29,7 +29,7 @@ const Auths = ({ children }) => {
   const registerUser = async (userData) => {
           try {
   
-              const response = await axios.post(`http://localhost:8000/api/auth/usercreate`, userData);
+              const response = await axios.post(`https://workflow-backend-api.vercel.app/api/auth/usercreate`, userData);
   
               const { success, message, isError } = response.data;
   
@@ -48,7 +48,7 @@ const Auths = ({ children }) => {
       const loginUser = async (userData) => {
               try {
       
-                  const response = await axios.post(`http://localhost:8000/api/auth/userlogin`, userData);
+                  const response = await axios.post(`https://workflow-backend-api.vercel.app/api/auth/userlogin`, userData);
       
                   const { success, message, isError, data } = response.data;
       
