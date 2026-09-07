@@ -127,11 +127,11 @@ function Navbar() {
                   {l.label}
                 </a>
               ))}
-              <a href="#views" onClick={() => setMobileOpen(false)} className="flex items-center justify-center gap-1.5 px-4 py-2.5 mt-2 text-sm font-semibold text-white rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+              <Link to="/auth/login" onClick={() => setMobileOpen(false)} className="flex items-center justify-center gap-1.5 px-4 py-2.5 mt-2 text-sm font-semibold text-white rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
                 <LogIn className="w-4 h-4" />
                 Live Demo
                 <ArrowRight className="w-4 h-4" />
-              </a>
+              </Link>
             </div>
           </motion.div>
         )}

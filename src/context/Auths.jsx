@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer } from "react";
+import { createContext, useContext, useEffect, useReducer } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -26,12 +26,20 @@ const Auths = ({ children }) => {
 
   const navigate = useNavigate();
 
+  useEffect(()=> {
+    const user = JSON.parse(localStorage.getItem("data"));
+    if (user) {
+      dispatch({ type: "SET_LOGIN", payload: { user } });
+    }
+  }, []);
+
   const registerUser = async (userData) => {
           try {
   
-              const response = await axios.post(`https://workflow-backend-api.vercel.app/api/auth/usercreate`, userData);
+              // const response = await axios.post(`https://workflow-backend-api.vercel.app/api/auth/usercreate`, userData);
+              const response = await axios.post(`http://localhost:8000/api/auth/usercreate`, userData);
   
-              const { success, message, isError } = response.data;
+              const { message, isError, success } = response.data;
   
               if (isError) {
                   toast.error(message);
@@ -48,18 +56,19 @@ const Auths = ({ children }) => {
       const loginUser = async (userData) => {
               try {
       
-                  const response = await axios.post(`https://workflow-backend-api.vercel.app/api/auth/userlogin`, userData);
+                  const response = await axios.post(`http://localhost:8000/api/auth/userlogin`, userData);
+                  // const response = await axios.post(`https://workflow-backend-api.vercel.app/api/auth/userlogin`, userData);
       
                   const { success, message, isError, data } = response.data;
       
                   if (isError) {
                       toast.error(message);
-                      localStorage.removeItem('token');
+                      localStorage.removeItem('data');
                       return;
                   }
       
                   if (success) {
-                      // localStorage.setItem('token', token);
+                      localStorage.setItem('data', JSON.stringify(data));
                       dispatch({ type: 'SET_LOGIN', payload: { user: data } });
                   }
       
@@ -71,8 +80,34 @@ const Auths = ({ children }) => {
               }
           };
 
+          const logoutUser = async () => {
+              try {
+      
+                  const response = await axios.delete(`http://localhost:8000/api/auth/userdelete`);
+                  // const response = await axios.delete(`https://workflow-backend-api.vercel.app/api/auth/userdelete`, userData);
+      
+                  const { success, message, isError } = response.data;
+      
+                  if (isError) {
+                      toast.error(message);
+                      return;
+                  }
+      
+                  if (success) {
+                      localStorage.removeItem('data');
+                      dispatch({ type: 'SET_LOGOUT'});
+                  }
+      
+                  return { success };
+      
+              } catch (error) {
+                  console.error('Error logging in user:', error);
+                  localStorage.removeItem('token');
+              }
+          };
+
   return (
-    <userContext.Provider value={{ ...state, reducer, registerUser, loginUser }}>
+    <userContext.Provider value={{ ...state, reducer, registerUser, loginUser, logoutUser }}>
       {children}
     </userContext.Provider>
   );

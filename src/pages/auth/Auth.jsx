@@ -86,7 +86,7 @@ function AuthPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-  const { loginUser } = userAuth(); 
+  const { loginUser, registerUser } = userAuth(); 
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -138,15 +138,24 @@ function AuthPage() {
     e.preventDefault();
     // if (!validate()) return;
     console.log(mode);
-    // if (mode === "signup") {
-      
-    // } else
-       if (mode === "login") {
+    if (mode === "signup") {
+      if (!name || !email || !password) {
+        toast.error("Email and password are required");
+        return;
+      }
+      const datas = {name, email, password};
+      const res = await registerUser(datas);
+
+      if (res.success) {
+        toast.success("Registered successfully!");
+        setMode('login');
+      };
+    } else if (mode === "login") {
       if (!email || !password) {
         toast.error("Email and password are required");
         return;
       }
-        const data = {name, email, password};
+        const data = {email, password};
         const res = await loginUser(data);
 
         if (res.success) {

@@ -47,21 +47,26 @@ import {
   Save,
   AlertCircle,
   Info,
+  Sun,
+  Moon,
+  LogOut,
 } from 'lucide-react';
+import { userAuth } from '../../../context/Auths';
+import { useNavigate } from 'react-router-dom';
 
 /* ═══════════════════════════════════════════════════════════════
    HELPERS
    ═══════════════════════════════════════════════════════════════ */
 
 const priorityStyles = {
-  low: { label: 'Low', badge: 'bg-slate-700/60 text-slate-300 border-slate-600/50', dot: 'bg-slate-400' },
+  low: { label: 'Low', badge: 'bg-slate-300/60 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 border-slate-400/50 dark:border-slate-600/50', dot: 'bg-slate-600 dark:bg-slate-400' },
   medium: { label: 'Medium', badge: 'bg-sky-500/15 text-sky-300 border-sky-500/30', dot: 'bg-sky-400' },
   high: { label: 'High', badge: 'bg-amber-500/15 text-amber-300 border-amber-500/30', dot: 'bg-amber-400' },
   urgent: { label: 'Urgent', badge: 'bg-rose-500/15 text-rose-300 border-rose-500/30', dot: 'bg-rose-400' },
 };
 
 const statusConfig = {
-  todo: { label: 'To Do', color: 'text-slate-400', border: 'border-slate-600/50' },
+  todo: { label: 'To Do', color: 'text-slate-600 dark:text-slate-400', border: 'border-slate-400/50 dark:border-slate-600/50' },
   'in-progress': { label: 'In Progress', color: 'text-sky-400', border: 'border-sky-500/40' },
   review: { label: 'In Review', color: 'text-amber-400', border: 'border-amber-500/40' },
   done: { label: 'Done', color: 'text-emerald-400', border: 'border-emerald-500/40' },
@@ -309,8 +314,19 @@ function AppProvider({ children }) {
   const [profile, setProfile] = useLocalStorage('wfp_profile', initialProfile);
   const [toasts, setToasts] = useState([]);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [theme, setTheme] = useLocalStorage('wfp_theme', 'dark');
 
   const currentUser = { ...users[0], role, name: profile.name, email: profile.email, avatar: profile.avatar };
+
+  const isDark = theme === 'dark';
+  const toggleTheme = useCallback(() => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  }, [setTheme]);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    document.body.className = theme === 'dark' ? 'bg-slate-950' : 'bg-slate-50';
+  }, [theme]);
 
   useEffect(() => {
     const goOnline = () => setIsOnline(true);
@@ -428,7 +444,7 @@ function AppProvider({ children }) {
     users, currentUser, role, tasks, projects, notifications, profile, toasts, isOnline,
     setRole, updateProfile, addTask, updateTask, deleteTask, toggleSubtask, addSubtask,
     addComment, addAttachment, markNotificationRead, markAllNotificationsRead,
-    pushToast, dismissToast, exportData,
+    pushToast, dismissToast, exportData, theme, isDark, toggleTheme,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
@@ -448,7 +464,7 @@ function Avatar({ initials, size = 'md', className = '' }) {
   const sizes = { sm: 'h-7 w-7 text-xs', md: 'h-9 w-9 text-sm', lg: 'h-12 w-12 text-base' };
   const gradient = initialsToColor(initials);
   return (
-    <div className={`${sizes[size]} ${className} rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center font-semibold text-white shrink-0 ring-2 ring-white/10`}>
+    <div className={`${sizes[size]} ${className} rounded-full bg-gradient-to-br ${gradient} flex items-center justify-center font-semibold text-slate-900 dark:text-white shrink-0 ring-2 ring-white/10`}>
       {initials}
     </div>
   );
@@ -466,15 +482,15 @@ function Modal({ isOpen, onClose, children, title, maxWidth = 'max-w-2xl' }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
       <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm animate-fade-in" onClick={onClose} />
-      <div className={`relative w-full ${maxWidth} max-h-[90vh] overflow-y-auto rounded-2xl border border-slate-700/60 bg-slate-900/95 backdrop-blur-2xl shadow-2xl shadow-black/50 animate-scale-in`}>
+      <div className={`relative w-full ${maxWidth} max-h-[90vh] overflow-y-auto rounded-2xl border border-slate-300/60 dark:border-slate-700/60 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-2xl shadow-2xl shadow-black/50 animate-scale-in`}>
         {title && (
-          <div className="flex items-center justify-between border-b border-slate-700/50 px-6 py-4 sticky top-0 bg-slate-900/95 backdrop-blur-xl z-10">
-            <h2 className="text-lg font-semibold text-white">{title}</h2>
-            <button onClick={onClose} className="rounded-lg p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"><X className="h-5 w-5" /></button>
+          <div className="flex items-center justify-between border-b border-slate-300/50 dark:border-slate-700/50 px-6 py-4 sticky top-0 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-xl z-10">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">{title}</h2>
+            <button onClick={onClose} className="rounded-lg p-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"><X className="h-5 w-5" /></button>
           </div>
         )}
         {!title && (
-          <button onClick={onClose} className="absolute top-4 right-4 z-20 rounded-lg p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"><X className="h-5 w-5" /></button>
+          <button onClick={onClose} className="absolute top-4 right-4 z-20 rounded-lg p-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"><X className="h-5 w-5" /></button>
         )}
         {children}
       </div>
@@ -493,15 +509,15 @@ function DropdownSelect({ value, options, onChange, className = '', renderLabel 
   }, [open]);
   return (
     <div ref={ref} className={`relative ${className}`}>
-      <button onClick={() => setOpen((o) => !o)} className="flex items-center gap-1.5 rounded-lg hover:bg-slate-800/60 px-2 py-1 transition-colors">
+      <button onClick={() => setOpen((o) => !o)} className="flex items-center gap-1.5 rounded-lg hover:bg-slate-200/60 dark:hover:bg-slate-800/60 px-2 py-1 transition-colors">
         {renderLabel(value)}
-        <ChevronDown className="h-3.5 w-3.5 text-slate-500" />
+        <ChevronDown className="h-3.5 w-3.5 text-slate-500 dark:text-slate-500" />
       </button>
       {open && (
-        <div className="absolute top-full left-0 mt-1 z-30 min-w-[140px] rounded-lg border border-slate-700/60 bg-slate-900 shadow-xl py-1 animate-fade-in">
+        <div className="absolute top-full left-0 mt-1 z-30 min-w-[140px] rounded-lg border border-slate-300/60 dark:border-slate-700/60 bg-slate-100 dark:bg-slate-900 shadow-xl py-1 animate-fade-in">
           {options.map((opt) => (
             <button key={opt.value} onClick={() => { onChange(opt.value); setOpen(false); }}
-              className={`w-full text-left px-3 py-1.5 text-sm hover:bg-slate-800 transition-colors ${opt.value === value ? 'text-white bg-slate-800/50' : 'text-slate-400'}`}>
+              className={`w-full text-left px-3 py-1.5 text-sm hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors ${opt.value === value ? 'text-slate-900 dark:text-white bg-slate-200/50 dark:bg-slate-800/50' : 'text-slate-600 dark:text-slate-400'}`}>
               {opt.label}
             </button>
           ))}
@@ -548,10 +564,10 @@ function ToastContainer() {
         const Icon = toast.type === 'success' ? CheckCircle2 : toast.type === 'error' ? AlertCircle : Info;
         const accent = toast.type === 'success' ? 'border-emerald-500/40 text-emerald-400' : toast.type === 'error' ? 'border-rose-500/40 text-rose-400' : 'border-indigo-500/40 text-indigo-400';
         return (
-          <div key={toast.id} className={`flex items-start gap-3 rounded-xl border ${accent} bg-slate-900/95 backdrop-blur-xl px-4 py-3 shadow-2xl shadow-black/50 animate-slide-in-right`}>
+          <div key={toast.id} className={`flex items-start gap-3 rounded-xl border ${accent} bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-xl px-4 py-3 shadow-2xl shadow-black/50 animate-slide-in-right`}>
             <Icon className="h-5 w-5 shrink-0 mt-0.5" />
-            <p className="text-sm text-slate-200 flex-1 leading-relaxed">{toast.message}</p>
-            <button onClick={() => dismissToast(toast.id)} className="text-slate-500 hover:text-slate-300 transition-colors"><X className="h-4 w-4" /></button>
+            <p className="text-sm text-slate-800 dark:text-slate-200 flex-1 leading-relaxed">{toast.message}</p>
+            <button onClick={() => dismissToast(toast.id)} className="text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"><X className="h-4 w-4" /></button>
           </div>
         );
       })}
@@ -570,26 +586,39 @@ const navItems = [
 ];
 
 function Sidebar({ activeTab, onTabChange, isMobileOpen, onMobileClose, unreadCount }) {
-  const { currentUser, role, setRole, tasks } = useApp();
+  const {user, logoutUser} = userAuth();
+  const { currentUser, role, setRole, tasks, isDark, toggleTheme } = useApp();
   const myTasks = tasks.filter((t) => t.assigneeId === currentUser.id);
   const pendingCount = myTasks.filter((t) => t.status !== 'done').length;
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      let res = await logoutUser();
+      if (res.success) {
+        navigate('/auth/login', { replace: true });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <>
       {isMobileOpen && <div className="fixed inset-0 z-40 bg-slate-950/70 backdrop-blur-sm lg:hidden" onClick={onMobileClose} />}
-      <aside className={`fixed lg:sticky top-0 left-0 z-50 h-screen w-72 shrink-0 border-r border-slate-800/60 bg-slate-900/60 backdrop-blur-2xl transition-transform duration-300 ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
+      <aside className={`fixed lg:sticky top-0 left-0 z-50 h-screen w-72 shrink-0 border-r border-slate-200/60 dark:border-slate-800/60 bg-slate-100/60 dark:bg-slate-900/60 backdrop-blur-2xl transition-transform duration-300 ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         <div className="flex h-full flex-col">
-          <div className="flex items-center justify-between px-6 py-5 border-b border-slate-800/60">
+          <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200/60 dark:border-slate-800/60">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/20">
-                <Workflow className="h-5 w-5 text-white" />
+                <Workflow className="h-5 w-5 text-slate-900 dark:text-white" />
               </div>
               <div>
-                <h1 className="text-base font-bold text-white tracking-tight">WorkFlow Pro</h1>
-                <p className="text-xs text-slate-500">Member Workspace</p>
+                <h1 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">WorkFlow Pro</h1>
+                <p className="text-xs text-slate-500 dark:text-slate-500">Member Workspace</p>
               </div>
             </div>
-            <button onClick={onMobileClose} className="lg:hidden text-slate-400 hover:text-white"><X className="h-5 w-5" /></button>
+            <button onClick={onMobileClose} className="lg:hidden text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"><X className="h-5 w-5" /></button>
           </div>
 
           <nav className="flex-1 px-4 py-6 space-y-1">
@@ -598,8 +627,8 @@ function Sidebar({ activeTab, onTabChange, isMobileOpen, onMobileClose, unreadCo
               const active = activeTab === item.id;
               return (
                 <button key={item.id} onClick={() => { onTabChange(item.id); onMobileClose(); }}
-                  className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${active ? 'bg-gradient-to-r from-indigo-500/15 to-violet-500/10 text-white border border-indigo-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800/50 border border-transparent'}`}>
-                  <Icon className={`h-5 w-5 transition-colors ${active ? 'text-indigo-400' : 'text-slate-500 group-hover:text-slate-300'}`} />
+                  className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${active ? 'bg-gradient-to-r from-indigo-500/15 to-violet-500/10 text-slate-900 dark:text-white border border-indigo-500/30' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-slate-800/50 border border-transparent'}`}>
+                  <Icon className={`h-5 w-5 transition-colors ${active ? 'text-indigo-400' : 'text-slate-500 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300'}`} />
                   {item.label}
                   {item.id === 'workspace' && pendingCount > 0 && <span className="ml-auto rounded-full bg-indigo-500/20 px-2 py-0.5 text-xs text-indigo-300">{pendingCount}</span>}
                   {item.id === 'dashboard' && unreadCount > 0 && <span className="ml-auto flex h-2 w-2 rounded-full bg-rose-400" />}
@@ -608,12 +637,12 @@ function Sidebar({ activeTab, onTabChange, isMobileOpen, onMobileClose, unreadCo
             })}
           </nav>
 
-          <div className="px-4 py-4 border-t border-slate-800/60">
-            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2 px-1">Active Role</p>
-            <div className="flex gap-1.5 rounded-xl bg-slate-800/50 p-1">
+          <div className="px-4 py-4 border-t border-slate-200/60 dark:border-slate-800/60">
+            <p className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider mb-2 px-1">Active Role</p>
+            <div className="flex gap-1.5 rounded-xl bg-slate-200/50 dark:bg-slate-800/50 p-1">
               {['Member', 'Viewer'].map((r) => (
                 <button key={r} onClick={() => setRole(r)}
-                  className={`flex-1 rounded-lg px-3 py-2 text-xs font-medium transition-all ${role === r ? (r === 'Member' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-slate-700/60 text-slate-300 border border-slate-600/40') : 'text-slate-500 hover:text-slate-300 border border-transparent'}`}>
+                  className={`flex-1 rounded-lg px-3 py-2 text-xs font-medium transition-all ${role === r ? (r === 'Member' ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-slate-300/60 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 border border-slate-400/40 dark:border-slate-600/40') : 'text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 border border-transparent'}`}>
                   {r === 'Member' && <Sparkles className="inline h-3 w-3 mr-1" />}{r}
                 </button>
               ))}
@@ -621,13 +650,28 @@ function Sidebar({ activeTab, onTabChange, isMobileOpen, onMobileClose, unreadCo
             {role === 'Viewer' && <p className="mt-2 text-xs text-amber-400/80 px-1">Read-Only mode active</p>}
           </div>
 
+          <div className="px-4 pb-3">
+            <button onClick={toggleTheme} className="flex w-full cursor-pointer items-center gap-2.5 rounded-xl border border-slate-200/60 dark:border-slate-800/60 bg-slate-200/30 dark:bg-slate-800/30 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+              {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {isDark ? 'Light Mode' : 'Dark Mode'}
+            </button>
+          </div>
+
           <div className="px-4 pb-4">
-            <div className="flex items-center gap-3 rounded-xl border border-slate-800/60 bg-slate-800/30 p-3">
+            <div className="flex items-center gap-3 rounded-xl border border-slate-200/60 dark:border-slate-800/60 bg-slate-200/30 dark:bg-slate-800/30 p-3">
               <Avatar initials={currentUser.avatar} size="md" />
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-white truncate">{currentUser.name}</p>
-                <p className="text-xs text-slate-500 truncate">{currentUser.email}</p>
+                <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{user.name}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-500 truncate">{user.email}</p>
               </div>
+            </div>
+          </div>
+          <div className="px-4 pb-4">
+            <div className="flex items-center justify-center">
+              <button className="flex w-full cursor-pointer items-center gap-2 rounded-xl border border-slate-200/60 dark:border-slate-800/60 bg-red-200/30 dark:bg-red-800/30 px-3 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors" onClick={()=> handleLogout()}>
+                <LogOut className="h-4 w-4" />
+                Logout
+              </button>
             </div>
           </div>
         </div>
@@ -662,12 +706,12 @@ function Header({ onOpenCommand, onOpenMobileSidebar, onTaskClick }) {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-slate-800/60 bg-slate-950/80 backdrop-blur-xl px-4 sm:px-6 py-3.5">
-      <button onClick={onOpenMobileSidebar} className="lg:hidden text-slate-400 hover:text-white"><Menu className="h-5 w-5" /></button>
-      <button onClick={onOpenCommand} className="group flex flex-1 max-w-md items-center gap-2.5 rounded-xl border border-slate-700/50 bg-slate-900/60 px-3.5 py-2 text-sm text-slate-500 hover:border-slate-600/60 hover:bg-slate-800/60 transition-all">
-        <Search className="h-4 w-4 text-slate-500 group-hover:text-slate-400" />
+    <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-slate-200/60 dark:border-slate-800/60 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl px-4 sm:px-6 py-3.5">
+      <button onClick={onOpenMobileSidebar} className="lg:hidden text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"><Menu className="h-5 w-5" /></button>
+      <button onClick={onOpenCommand} className="group flex flex-1 max-w-md items-center gap-2.5 rounded-xl border border-slate-300/50 dark:border-slate-700/50 bg-slate-100/60 dark:bg-slate-900/60 px-3.5 py-2 text-sm text-slate-500 dark:text-slate-500 hover:border-slate-400/60 dark:hover:border-slate-600/60 hover:bg-slate-200/60 dark:hover:bg-slate-800/60 transition-all">
+        <Search className="h-4 w-4 text-slate-500 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-400" />
         <span className="flex-1 text-left">Search tasks, projects…</span>
-        <kbd className="hidden sm:inline-flex items-center gap-1 rounded-md border border-slate-700/50 bg-slate-800/60 px-1.5 py-0.5 text-xs text-slate-500 font-mono">⌘K</kbd>
+        <kbd className="hidden sm:inline-flex items-center gap-1 rounded-md border border-slate-300/50 dark:border-slate-700/50 bg-slate-200/60 dark:bg-slate-800/60 px-1.5 py-0.5 text-xs text-slate-500 dark:text-slate-500 font-mono">⌘K</kbd>
       </button>
       <div className="flex items-center gap-2 ml-auto">
         <div className={`hidden sm:flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors ${isOnline ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400' : 'border-amber-500/30 bg-amber-500/10 text-amber-400'}`}>
@@ -675,28 +719,28 @@ function Header({ onOpenCommand, onOpenMobileSidebar, onTaskClick }) {
           {isOnline ? 'Online' : 'Offline'}
         </div>
         <div ref={notifRef} className="relative">
-          <button onClick={() => setNotifOpen((o) => !o)} className="relative rounded-lg border border-slate-700/50 bg-slate-900/60 p-2.5 text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors">
+          <button onClick={() => setNotifOpen((o) => !o)} className="relative rounded-lg border border-slate-300/50 dark:border-slate-700/50 bg-slate-100/60 dark:bg-slate-900/60 p-2.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-slate-800/60 transition-colors">
             <Bell className="h-4 w-4" />
-            {unread > 0 && <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white ring-2 ring-slate-950">{unread}</span>}
+            {unread > 0 && <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-slate-900 dark:text-white ring-2 ring-slate-50 dark:ring-slate-950">{unread}</span>}
           </button>
           {notifOpen && (
-            <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 rounded-xl border border-slate-700/60 bg-slate-900/95 backdrop-blur-2xl shadow-2xl shadow-black/50 animate-fade-in overflow-hidden">
-              <div className="flex items-center justify-between border-b border-slate-800/60 px-4 py-3">
-                <h3 className="text-sm font-semibold text-white">Notifications</h3>
+            <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 rounded-xl border border-slate-300/60 dark:border-slate-700/60 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-2xl shadow-2xl shadow-black/50 animate-fade-in overflow-hidden">
+              <div className="flex items-center justify-between border-b border-slate-200/60 dark:border-slate-800/60 px-4 py-3">
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Notifications</h3>
                 {unread > 0 && <button onClick={markAllNotificationsRead} className="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 transition-colors"><Check className="h-3.5 w-3.5" />Mark all read</button>}
               </div>
               <div className="max-h-96 overflow-y-auto">
                 {notifications.length === 0 ? (
-                  <div className="px-4 py-8 text-center text-sm text-slate-500">No notifications yet</div>
+                  <div className="px-4 py-8 text-center text-sm text-slate-500 dark:text-slate-500">No notifications yet</div>
                 ) : (
                   notifications.map((n) => {
                     const Icon = notifIcons[n.type];
                     return (
-                      <button key={n.id} onClick={() => handleClick(n)} className={`flex w-full items-start gap-3 border-b border-slate-800/40 px-4 py-3 text-left hover:bg-slate-800/40 transition-colors ${!n.read ? 'bg-indigo-500/5' : ''}`}>
+                      <button key={n.id} onClick={() => handleClick(n)} className={`flex w-full items-start gap-3 border-b border-slate-200/40 dark:border-slate-800/40 px-4 py-3 text-left hover:bg-slate-200/40 dark:hover:bg-slate-800/40 transition-colors ${!n.read ? 'bg-indigo-500/5' : ''}`}>
                         <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${notifColors[n.type]}`}><Icon className="h-4 w-4" /></div>
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm text-slate-200 leading-snug">{n.text}</p>
-                          <p className="text-xs text-slate-500 mt-0.5">{timeAgo(n.createdAt)}</p>
+                          <p className="text-sm text-slate-800 dark:text-slate-200 leading-snug">{n.text}</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-500 mt-0.5">{timeAgo(n.createdAt)}</p>
                         </div>
                         {!n.read && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-indigo-400" />}
                       </button>
@@ -717,6 +761,7 @@ function Header({ onOpenCommand, onOpenMobileSidebar, onTaskClick }) {
    ═══════════════════════════════════════════════════════════════ */
 
 function Dashboard({ onTaskClick, onQuickAdd, onGoToWorkspace }) {
+  const { user } = userAuth();
   const { currentUser, tasks, projects, role } = useApp();
   const myTasks = useMemo(() => tasks.filter((t) => t.assigneeId === currentUser.id), [tasks, currentUser.id]);
   const pending = myTasks.filter((t) => t.status !== 'done');
@@ -734,21 +779,23 @@ function Dashboard({ onTaskClick, onQuickAdd, onGoToWorkspace }) {
 
   const greeting = (() => { const h = new Date().getHours(); if (h < 12) return 'Good morning'; if (h < 18) return 'Good afternoon'; return 'Good evening'; })();
 
+  console.log(user);
+
   return (
     <div className="space-y-6">
-      <div className="relative overflow-hidden rounded-2xl border border-indigo-500/20 bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/40 p-6 sm:p-8">
+      <div className="relative overflow-hidden rounded-2xl border border-indigo-500/20 bg-gradient-to-br from-slate-100 dark:from-slate-900 via-slate-100 dark:via-slate-900 to-indigo-950/40 p-6 sm:p-8">
         <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-indigo-500/10 blur-3xl" />
         <div className="absolute -bottom-20 -left-10 h-48 w-48 rounded-full bg-violet-500/10 blur-3xl" />
         <div className="relative flex flex-col sm:flex-row sm:items-center gap-5">
           <Avatar initials={currentUser.avatar} size="lg" className="h-16 w-16 text-xl" />
           <div className="flex-1">
             <div className="flex items-center gap-2.5 flex-wrap">
-              <h1 className="text-2xl font-bold text-white tracking-tight">{greeting}, {currentUser.name.split(' ')[0]}</h1>
-              <span className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${role === 'Member' ? 'border-indigo-500/30 bg-indigo-500/15 text-indigo-300' : 'border-slate-600/40 bg-slate-700/40 text-slate-300'}`}>{role}</span>
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">{greeting}, {user?.name?.split(' ')[0] || "User"}</h1>
+              <span className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${role === 'Member' ? 'border-indigo-500/30 bg-indigo-500/15 text-indigo-300' : 'border-slate-400/40 dark:border-slate-600/40 bg-slate-300/40 dark:bg-slate-700/40 text-slate-700 dark:text-slate-300'}`}>{role}</span>
             </div>
-            <p className="mt-1 text-sm text-slate-400">You have <span className="text-indigo-300 font-medium">{pending.length} tasks</span> in progress across <span className="text-indigo-300 font-medium">{new Set(myTasks.map((t) => t.projectId)).size} projects</span>.</p>
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">You have <span className="text-indigo-300 font-medium">{pending.length} tasks</span> in progress across <span className="text-indigo-300 font-medium">{new Set(myTasks.map((t) => t.projectId)).size} projects</span>.</p>
           </div>
-          <button onClick={onQuickAdd} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 hover:scale-[1.02] transition-all">
+          <button onClick={onQuickAdd} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2.5 text-sm font-medium text-slate-900 dark:text-white shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 hover:scale-[1.02] transition-all">
             <Plus className="h-4 w-4" />Quick Add Task
           </button>
         </div>
@@ -756,21 +803,21 @@ function Dashboard({ onTaskClick, onQuickAdd, onGoToWorkspace }) {
           {stats.map((stat) => { const Icon = stat.icon; return (
             <div key={stat.label} className={`flex items-center gap-3 rounded-xl border ${stat.border} ${stat.bg} px-4 py-3`}>
               <Icon className={`h-5 w-5 ${stat.color}`} />
-              <div><p className="text-xl font-bold text-white">{stat.value}</p><p className="text-xs text-slate-400">{stat.label}</p></div>
+              <div><p className="text-xl font-bold text-slate-900 dark:text-white">{stat.value}</p><p className="text-xs text-slate-600 dark:text-slate-400">{stat.label}</p></div>
             </div>
           ); })}
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 rounded-2xl border border-slate-800/60 bg-slate-900/60 backdrop-blur-xl overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800/60">
-            <h2 className="text-base font-semibold text-white">Assigned to Me</h2>
+        <div className="lg:col-span-2 rounded-2xl border border-slate-200/60 dark:border-slate-800/60 bg-slate-100/60 dark:bg-slate-900/60 backdrop-blur-xl overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-slate-200/60 dark:border-slate-800/60">
+            <h2 className="text-base font-semibold text-slate-900 dark:text-white">Assigned to Me</h2>
             <button onClick={onGoToWorkspace} className="flex items-center gap-1 text-xs text-indigo-400 hover:text-indigo-300 transition-colors">View all <ChevronRight className="h-3.5 w-3.5" /></button>
           </div>
-          <div className="divide-y divide-slate-800/40">
+          <div className="divide-y divide-slate-200/40 dark:divide-slate-800/40">
             {pending.length === 0 ? (
-              <div className="px-5 py-12 text-center text-sm text-slate-500">All caught up! No pending tasks.</div>
+              <div className="px-5 py-12 text-center text-sm text-slate-500 dark:text-slate-500">All caught up! No pending tasks.</div>
             ) : (
               pending.slice(0, 6).map((task) => {
                 const project = projects.find((p) => p.id === task.projectId);
@@ -778,18 +825,18 @@ function Dashboard({ onTaskClick, onQuickAdd, onGoToWorkspace }) {
                 const completedSubs = task.subtasks.filter((s) => s.completed).length;
                 const p = priorityStyles[task.priority];
                 return (
-                  <button key={task.id} onClick={() => onTaskClick(task.id)} className="group flex w-full items-center gap-3 px-5 py-3.5 text-left hover:bg-slate-800/30 transition-colors">
+                  <button key={task.id} onClick={() => onTaskClick(task.id)} className="group flex w-full items-center gap-3 px-5 py-3.5 text-left hover:bg-slate-200/30 dark:hover:bg-slate-800/30 transition-colors">
                     <span className={`h-2 w-2 shrink-0 rounded-full ${p.dot}`} />
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-slate-200 truncate group-hover:text-white transition-colors">{task.title}</p>
+                      <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{task.title}</p>
                       <div className="flex items-center gap-2 mt-1">
-                        {project && <span className="text-xs text-slate-500">{project.name}</span>}
-                        {task.subtasks.length > 0 && <span className="text-xs text-slate-600">· {completedSubs}/{task.subtasks.length} subtasks</span>}
+                        {project && <span className="text-xs text-slate-500 dark:text-slate-500">{project.name}</span>}
+                        {task.subtasks.length > 0 && <span className="text-xs text-slate-400 dark:text-slate-600">· {completedSubs}/{task.subtasks.length} subtasks</span>}
                       </div>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      {task.labels.slice(0, 1).map((label) => <span key={label} className="hidden sm:inline rounded-md bg-slate-800/60 px-2 py-0.5 text-xs text-slate-400">{label}</span>)}
-                      <span className={`flex items-center gap-1 text-xs ${overdue ? 'text-rose-400' : 'text-slate-500'}`}>{overdue && <AlertTriangle className="h-3 w-3" />}{formatDate(task.dueDate)}</span>
+                      {task.labels.slice(0, 1).map((label) => <span key={label} className="hidden sm:inline rounded-md bg-slate-200/60 dark:bg-slate-800/60 px-2 py-0.5 text-xs text-slate-600 dark:text-slate-400">{label}</span>)}
+                      <span className={`flex items-center gap-1 text-xs ${overdue ? 'text-rose-400' : 'text-slate-500 dark:text-slate-500'}`}>{overdue && <AlertTriangle className="h-3 w-3" />}{formatDate(task.dueDate)}</span>
                     </div>
                   </button>
                 );
@@ -798,26 +845,26 @@ function Dashboard({ onTaskClick, onQuickAdd, onGoToWorkspace }) {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-800/60 bg-slate-900/60 backdrop-blur-xl overflow-hidden">
-          <div className="flex items-center gap-2 px-5 py-4 border-b border-slate-800/60">
+        <div className="rounded-2xl border border-slate-200/60 dark:border-slate-800/60 bg-slate-100/60 dark:bg-slate-900/60 backdrop-blur-xl overflow-hidden">
+          <div className="flex items-center gap-2 px-5 py-4 border-b border-slate-200/60 dark:border-slate-800/60">
             <CalendarDays className="h-4 w-4 text-indigo-400" />
-            <h2 className="text-base font-semibold text-white">Due This Week</h2>
+            <h2 className="text-base font-semibold text-slate-900 dark:text-white">Due This Week</h2>
           </div>
           <div className="p-4">
             {dueSoon.length === 0 ? (
-              <div className="py-8 text-center text-sm text-slate-500">Nothing due this week.</div>
+              <div className="py-8 text-center text-sm text-slate-500 dark:text-slate-500">Nothing due this week.</div>
             ) : (
               <div className="relative space-y-0">
-                <div className="absolute left-[15px] top-2 bottom-2 w-px bg-slate-800" />
+                <div className="absolute left-[15px] top-2 bottom-2 w-px bg-slate-200 dark:bg-slate-800" />
                 {dueSoon.map((task) => {
                   const d = daysUntil(task.dueDate);
                   const overdue = isOverdue(task.dueDate, task.status);
                   return (
-                    <button key={task.id} onClick={() => onTaskClick(task.id)} className="group relative flex w-full items-start gap-3 py-2.5 text-left hover:bg-slate-800/30 rounded-lg px-1 -mx-1 transition-colors">
-                      <div className={`relative z-10 mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${overdue ? 'bg-rose-500/20 text-rose-400 ring-2 ring-rose-500/20' : 'bg-slate-800 text-slate-400 ring-2 ring-slate-900'}`}>{d === 0 ? '!' : d}</div>
+                    <button key={task.id} onClick={() => onTaskClick(task.id)} className="group relative flex w-full items-start gap-3 py-2.5 text-left hover:bg-slate-200/30 dark:hover:bg-slate-800/30 rounded-lg px-1 -mx-1 transition-colors">
+                      <div className={`relative z-10 mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${overdue ? 'bg-rose-500/20 text-rose-400 ring-2 ring-rose-500/20' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 ring-2 ring-slate-100 dark:ring-slate-900'}`}>{d === 0 ? '!' : d}</div>
                       <div className="min-w-0 flex-1 pt-0.5">
-                        <p className="text-sm text-slate-200 truncate group-hover:text-white transition-colors">{task.title}</p>
-                        <p className={`text-xs ${overdue ? 'text-rose-400' : 'text-slate-500'}`}>{formatDate(task.dueDate)}</p>
+                        <p className="text-sm text-slate-800 dark:text-slate-200 truncate group-hover:text-slate-900 dark:group-hover:text-white transition-colors">{task.title}</p>
+                        <p className={`text-xs ${overdue ? 'text-rose-400' : 'text-slate-500 dark:text-slate-500'}`}>{formatDate(task.dueDate)}</p>
                       </div>
                     </button>
                   );
@@ -838,8 +885,8 @@ function Dashboard({ onTaskClick, onQuickAdd, onGoToWorkspace }) {
 function FilterChip({ label, value, onChange, options }) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-xs text-slate-500 font-medium">{label}</span>
-      <select value={value} onChange={(e) => onChange(e.target.value)} className="rounded-lg border border-slate-700/50 bg-slate-800/60 px-2.5 py-1.5 text-xs text-slate-200 focus:border-indigo-500/50 focus:outline-none cursor-pointer">
+      <span className="text-xs text-slate-500 dark:text-slate-500 font-medium">{label}</span>
+      <select value={value} onChange={(e) => onChange(e.target.value)} className="rounded-lg border border-slate-300/50 dark:border-slate-700/50 bg-slate-200/60 dark:bg-slate-800/60 px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:border-indigo-500/50 focus:outline-none cursor-pointer">
         {options.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
       </select>
     </div>
@@ -854,9 +901,9 @@ function StatusSelectInline({ value, onChange }) {
       {open && (
         <>
           <div className="fixed inset-0 z-20" onClick={() => setOpen(false)} />
-          <div className="absolute top-full left-0 mt-1 z-30 min-w-[130px] rounded-lg border border-slate-700/60 bg-slate-900 shadow-xl py-1 animate-fade-in">
+          <div className="absolute top-full left-0 mt-1 z-30 min-w-[130px] rounded-lg border border-slate-300/60 dark:border-slate-700/60 bg-slate-100 dark:bg-slate-900 shadow-xl py-1 animate-fade-in">
             {statusOrder.map((s) => (
-              <button key={s} onClick={() => { onChange(s); setOpen(false); }} className={`w-full text-left px-3 py-1.5 text-sm hover:bg-slate-800 transition-colors ${s === value ? statusConfig[s].color + ' bg-slate-800/50' : 'text-slate-400'}`}>{statusConfig[s].label}</button>
+              <button key={s} onClick={() => { onChange(s); setOpen(false); }} className={`w-full text-left px-3 py-1.5 text-sm hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors ${s === value ? statusConfig[s].color + ' bg-slate-200/50 dark:bg-slate-800/50' : 'text-slate-600 dark:text-slate-400'}`}>{statusConfig[s].label}</button>
             ))}
           </div>
         </>
@@ -873,17 +920,17 @@ function KanbanView({ tasks, onTaskClick }) {
         const colTasks = tasks.filter((t) => t.status === status);
         const cfg = statusConfig[status];
         return (
-          <div key={status} className={`flex flex-col rounded-xl border ${cfg.border} bg-slate-900/40 min-h-[200px]`}>
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800/40">
+          <div key={status} className={`flex flex-col rounded-xl border ${cfg.border} bg-slate-100/40 dark:bg-slate-900/40 min-h-[200px]`}>
+            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200/40 dark:border-slate-800/40">
               <div className="flex items-center gap-2">
                 <span className={`h-2 w-2 rounded-full ${cfg.color.replace('text-', 'bg-')}`} />
                 <h3 className={`text-sm font-semibold ${cfg.color}`}>{cfg.label}</h3>
               </div>
-              <span className="text-xs text-slate-500">{colTasks.length}</span>
+              <span className="text-xs text-slate-500 dark:text-slate-500">{colTasks.length}</span>
             </div>
             <div className="flex flex-col gap-2.5 p-3 flex-1">
               {colTasks.length === 0 ? (
-                <div className="flex flex-1 items-center justify-center py-8 text-xs text-slate-600">No tasks</div>
+                <div className="flex flex-1 items-center justify-center py-8 text-xs text-slate-400 dark:text-slate-600">No tasks</div>
               ) : (
                 colTasks.map((task) => {
                   const project = projects.find((p) => p.id === task.projectId);
@@ -891,19 +938,19 @@ function KanbanView({ tasks, onTaskClick }) {
                   const completedSubs = task.subtasks.filter((s) => s.completed).length;
                   const overdue = isOverdue(task.dueDate, task.status);
                   return (
-                    <button key={task.id} onClick={() => onTaskClick(task.id)} className="group rounded-lg border border-slate-700/40 bg-slate-800/40 p-3.5 text-left hover:border-indigo-500/30 hover:bg-slate-800/70 transition-all hover:shadow-lg hover:shadow-indigo-500/5">
+                    <button key={task.id} onClick={() => onTaskClick(task.id)} className="group rounded-lg border border-slate-300/40 dark:border-slate-700/40 bg-slate-200/40 dark:bg-slate-800/40 p-3.5 text-left hover:border-indigo-500/30 hover:bg-slate-200/70 dark:hover:bg-slate-800/70 transition-all hover:shadow-lg hover:shadow-indigo-500/5">
                       <div className="flex items-start gap-2">
                         <span className={`mt-1 h-2 w-2 shrink-0 rounded-full ${p.dot}`} />
-                        <p className="text-sm font-medium text-slate-200 group-hover:text-white transition-colors flex-1">{task.title}</p>
+                        <p className="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white transition-colors flex-1">{task.title}</p>
                       </div>
-                      {task.description && <p className="mt-1.5 text-xs text-slate-500 line-clamp-2 ml-4">{task.description}</p>}
+                      {task.description && <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-500 line-clamp-2 ml-4">{task.description}</p>}
                       <div className="mt-2.5 flex flex-wrap items-center gap-1.5 ml-4">
-                        {task.labels.slice(0, 2).map((l) => <span key={l} className="rounded-md bg-slate-700/40 px-1.5 py-0.5 text-[10px] text-slate-400">{l}</span>)}
-                        {project && <span className="text-[10px] text-slate-500">· {project.name}</span>}
+                        {task.labels.slice(0, 2).map((l) => <span key={l} className="rounded-md bg-slate-300/40 dark:bg-slate-700/40 px-1.5 py-0.5 text-[10px] text-slate-600 dark:text-slate-400">{l}</span>)}
+                        {project && <span className="text-[10px] text-slate-500 dark:text-slate-500">· {project.name}</span>}
                       </div>
                       <div className="mt-2.5 flex items-center justify-between ml-4">
-                        <span className={`text-xs ${overdue ? 'text-rose-400' : 'text-slate-500'}`}>{formatDate(task.dueDate)}</span>
-                        {task.subtasks.length > 0 && <span className="text-xs text-slate-500">{completedSubs}/{task.subtasks.length}</span>}
+                        <span className={`text-xs ${overdue ? 'text-rose-400' : 'text-slate-500 dark:text-slate-500'}`}>{formatDate(task.dueDate)}</span>
+                        {task.subtasks.length > 0 && <span className="text-xs text-slate-500 dark:text-slate-500">{completedSubs}/{task.subtasks.length}</span>}
                       </div>
                     </button>
                   );
@@ -920,13 +967,13 @@ function KanbanView({ tasks, onTaskClick }) {
 function ListView({ tasks, onTaskClick }) {
   const { projects, updateTask, role } = useApp();
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-800/60 bg-slate-900/40">
-      <div className="hidden md:grid grid-cols-[1fr_120px_100px_120px_120px] gap-3 px-4 py-2.5 border-b border-slate-800/60 text-xs font-medium text-slate-500 uppercase tracking-wider">
+    <div className="overflow-hidden rounded-xl border border-slate-200/60 dark:border-slate-800/60 bg-slate-100/40 dark:bg-slate-900/40">
+      <div className="hidden md:grid grid-cols-[1fr_120px_100px_120px_120px] gap-3 px-4 py-2.5 border-b border-slate-200/60 dark:border-slate-800/60 text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider">
         <span>Task</span><span>Project</span><span>Priority</span><span>Status</span><span>Due Date</span>
       </div>
-      <div className="divide-y divide-slate-800/40">
+      <div className="divide-y divide-slate-200/40 dark:divide-slate-800/40">
         {tasks.length === 0 ? (
-          <div className="px-4 py-12 text-center text-sm text-slate-500">No tasks match your filters.</div>
+          <div className="px-4 py-12 text-center text-sm text-slate-500 dark:text-slate-500">No tasks match your filters.</div>
         ) : (
           tasks.map((task) => {
             const project = projects.find((p) => p.id === task.projectId);
@@ -934,13 +981,13 @@ function ListView({ tasks, onTaskClick }) {
             const overdue = isOverdue(task.dueDate, task.status);
             const cfg = statusConfig[task.status];
             return (
-              <div key={task.id} className="group grid grid-cols-1 md:grid-cols-[1fr_120px_100px_120px_120px] gap-3 px-4 py-3 hover:bg-slate-800/30 transition-colors items-center">
+              <div key={task.id} className="group grid grid-cols-1 md:grid-cols-[1fr_120px_100px_120px_120px] gap-3 px-4 py-3 hover:bg-slate-200/30 dark:hover:bg-slate-800/30 transition-colors items-center">
                 <button onClick={() => onTaskClick(task.id)} className="flex items-center gap-2.5 text-left min-w-0">
                   <span className={`h-2 w-2 shrink-0 rounded-full ${p.dot}`} />
-                  <span className="text-sm font-medium text-slate-200 group-hover:text-white truncate transition-colors">{task.title}</span>
-                  {task.subtasks.length > 0 && <span className="hidden sm:inline text-xs text-slate-600">({task.subtasks.filter((s) => s.completed).length}/{task.subtasks.length})</span>}
+                  <span className="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white truncate transition-colors">{task.title}</span>
+                  {task.subtasks.length > 0 && <span className="hidden sm:inline text-xs text-slate-400 dark:text-slate-600">({task.subtasks.filter((s) => s.completed).length}/{task.subtasks.length})</span>}
                 </button>
-                <span className="text-xs text-slate-500 truncate">{project?.name || '—'}</span>
+                <span className="text-xs text-slate-500 dark:text-slate-500 truncate">{project?.name || '—'}</span>
                 <div className="md:py-0.5">
                   {role !== 'Viewer' ? <PrioritySelect value={task.priority} onChange={(v) => updateTask(task.id, { priority: v })} /> : (
                     <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium border ${p.badge}`}><span className={`h-1.5 w-1.5 rounded-full ${p.dot}`} />{p.label}</span>
@@ -949,7 +996,7 @@ function ListView({ tasks, onTaskClick }) {
                 <div className="md:py-0.5">
                   {role !== 'Viewer' ? <StatusSelectInline value={task.status} onChange={(v) => updateTask(task.id, { status: v })} /> : <span className={`text-sm font-medium ${cfg.color}`}>{cfg.label}</span>}
                 </div>
-                <span className={`text-xs ${overdue ? 'text-rose-400 font-medium' : 'text-slate-500'}`}>{formatDate(task.dueDate)}</span>
+                <span className={`text-xs ${overdue ? 'text-rose-400 font-medium' : 'text-slate-500 dark:text-slate-500'}`}>{formatDate(task.dueDate)}</span>
               </div>
             );
           })
@@ -983,33 +1030,33 @@ function CalendarView({ tasks, onTaskClick }) {
   }, [tasks, month, year]);
 
   return (
-    <div className="rounded-xl border border-slate-800/60 bg-slate-900/40 overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-800/60">
-        <h3 className="text-base font-semibold text-white">{monthName}</h3>
-        <span className="text-xs text-slate-500">Tasks with due dates shown</span>
+    <div className="rounded-xl border border-slate-200/60 dark:border-slate-800/60 bg-slate-100/40 dark:bg-slate-900/40 overflow-hidden">
+      <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-200/60 dark:border-slate-800/60">
+        <h3 className="text-base font-semibold text-slate-900 dark:text-white">{monthName}</h3>
+        <span className="text-xs text-slate-500 dark:text-slate-500">Tasks with due dates shown</span>
       </div>
-      <div className="grid grid-cols-7 border-b border-slate-800/40">
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => <div key={d} className="px-2 py-2 text-center text-xs font-medium text-slate-500 uppercase">{d}</div>)}
+      <div className="grid grid-cols-7 border-b border-slate-200/40 dark:border-slate-800/40">
+        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => <div key={d} className="px-2 py-2 text-center text-xs font-medium text-slate-500 dark:text-slate-500 uppercase">{d}</div>)}
       </div>
       <div className="grid grid-cols-7">
         {cells.map((day, i) => {
           const dayTasks = day ? tasksByDay.get(day) || [] : [];
           const isToday = day === today.getDate();
           return (
-            <div key={i} className={`min-h-[80px] sm:min-h-[110px] border-b border-r border-slate-800/30 p-1.5 ${day ? 'bg-slate-900/20' : 'bg-slate-950/30'}`}>
+            <div key={i} className={`min-h-[80px] sm:min-h-[110px] border-b border-r border-slate-200/30 dark:border-slate-800/30 p-1.5 ${day ? 'bg-slate-100/20 dark:bg-slate-900/20' : 'bg-slate-50/30 dark:bg-slate-950/30'}`}>
               {day && (
                 <>
-                  <div className={`mb-1 text-xs font-medium ${isToday ? 'flex h-6 w-6 items-center justify-center rounded-full bg-indigo-500 text-white' : 'text-slate-500'}`}>{day}</div>
+                  <div className={`mb-1 text-xs font-medium ${isToday ? 'flex h-6 w-6 items-center justify-center rounded-full bg-indigo-500 text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-500'}`}>{day}</div>
                   <div className="space-y-1">
                     {dayTasks.slice(0, 3).map((t) => {
                       const p = priorityStyles[t.priority];
                       return (
-                        <button key={t.id} onClick={() => onTaskClick(t.id)} className="block w-full truncate rounded-md border border-slate-700/40 bg-slate-800/50 px-1.5 py-1 text-left text-xs text-slate-300 hover:border-indigo-500/30 hover:bg-slate-800 transition-colors">
+                        <button key={t.id} onClick={() => onTaskClick(t.id)} className="block w-full truncate rounded-md border border-slate-300/40 dark:border-slate-700/40 bg-slate-200/50 dark:bg-slate-800/50 px-1.5 py-1 text-left text-xs text-slate-700 dark:text-slate-300 hover:border-indigo-500/30 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
                           <span className={`mr-1 inline-block h-1.5 w-1.5 rounded-full ${p.dot}`} />{t.title}
                         </button>
                       );
                     })}
-                    {dayTasks.length > 3 && <span className="text-[10px] text-slate-500 px-1.5">+{dayTasks.length - 3} more</span>}
+                    {dayTasks.length > 3 && <span className="text-[10px] text-slate-500 dark:text-slate-500 px-1.5">+{dayTasks.length - 3} more</span>}
                   </div>
                 </>
               )}
@@ -1062,32 +1109,32 @@ function Workspace({ onTaskClick, onQuickAdd }) {
     <div className="space-y-5">
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap items-center gap-3">
-          <select value={selectedProject} onChange={(e) => setSelectedProject(e.target.value)} className="rounded-lg border border-slate-700/50 bg-slate-900/60 px-3 py-2 text-sm text-slate-200 focus:border-indigo-500/50 focus:outline-none cursor-pointer">
+          <select value={selectedProject} onChange={(e) => setSelectedProject(e.target.value)} className="rounded-lg border border-slate-300/50 dark:border-slate-700/50 bg-slate-100/60 dark:bg-slate-900/60 px-3 py-2 text-sm text-slate-800 dark:text-slate-200 focus:border-indigo-500/50 focus:outline-none cursor-pointer">
             <option value="all">All Projects</option>
             {projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
           </select>
-          <div className="flex gap-1 rounded-lg border border-slate-700/50 bg-slate-900/60 p-1">
+          <div className="flex gap-1 rounded-lg border border-slate-300/50 dark:border-slate-700/50 bg-slate-100/60 dark:bg-slate-900/60 p-1">
             {views.map((v) => { const Icon = v.icon; const active = view === v.id; return (
-              <button key={v.id} onClick={() => setView(v.id)} className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all ${active ? 'bg-indigo-500/20 text-indigo-300' : 'text-slate-400 hover:text-slate-200'}`}>
+              <button key={v.id} onClick={() => setView(v.id)} className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-all ${active ? 'bg-indigo-500/20 text-indigo-300' : 'text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
                 <Icon className="h-4 w-4" /><span className="hidden sm:inline">{v.label}</span>
               </button>
             ); })}
           </div>
-          <div className="flex flex-1 min-w-[180px] items-center gap-2 rounded-lg border border-slate-700/50 bg-slate-900/60 px-3 py-2">
-            <Search className="h-4 w-4 text-slate-500" />
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Filter by name…" className="flex-1 bg-transparent text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none" />
-            {search && <button onClick={() => setSearch('')} className="text-slate-500 hover:text-slate-300"><X className="h-3.5 w-3.5" /></button>}
+          <div className="flex flex-1 min-w-[180px] items-center gap-2 rounded-lg border border-slate-300/50 dark:border-slate-700/50 bg-slate-100/60 dark:bg-slate-900/60 px-3 py-2">
+            <Search className="h-4 w-4 text-slate-500 dark:text-slate-500" />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Filter by name…" className="flex-1 bg-transparent text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-500 dark:placeholder:text-slate-500 focus:outline-none" />
+            {search && <button onClick={() => setSearch('')} className="text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"><X className="h-3.5 w-3.5" /></button>}
           </div>
-          <button onClick={() => setShowFilters((s) => !s)} className={`relative flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${showFilters || activeFilters > 0 ? 'border-indigo-500/30 bg-indigo-500/10 text-indigo-300' : 'border-slate-700/50 bg-slate-900/60 text-slate-400 hover:text-slate-200'}`}>
+          <button onClick={() => setShowFilters((s) => !s)} className={`relative flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${showFilters || activeFilters > 0 ? 'border-indigo-500/30 bg-indigo-500/10 text-indigo-300' : 'border-slate-300/50 dark:border-slate-700/50 bg-slate-100/60 dark:bg-slate-900/60 text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
             <Filter className="h-4 w-4" /><span className="hidden sm:inline">Filters</span>
-            {activeFilters > 0 && <span className="flex h-4 w-4 items-center justify-center rounded-full bg-indigo-500 text-[10px] font-bold text-white">{activeFilters}</span>}
+            {activeFilters > 0 && <span className="flex h-4 w-4 items-center justify-center rounded-full bg-indigo-500 text-[10px] font-bold text-slate-900 dark:text-white">{activeFilters}</span>}
           </button>
-          <button onClick={onQuickAdd} className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-600 px-3.5 py-2 text-sm font-medium text-white shadow-lg shadow-indigo-500/20 hover:scale-[1.02] transition-all">
+          <button onClick={onQuickAdd} className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-600 px-3.5 py-2 text-sm font-medium text-slate-900 dark:text-white shadow-lg shadow-indigo-500/20 hover:scale-[1.02] transition-all">
             <Plus className="h-4 w-4" /><span className="hidden sm:inline">New Task</span>
           </button>
         </div>
         {showFilters && (
-          <div className="flex flex-wrap items-center gap-2 rounded-xl border border-slate-800/60 bg-slate-900/40 p-3 animate-fade-in">
+          <div className="flex flex-wrap items-center gap-2 rounded-xl border border-slate-200/60 dark:border-slate-800/60 bg-slate-100/40 dark:bg-slate-900/40 p-3 animate-fade-in">
             <FilterChip label="Priority" value={priorityFilter} onChange={(v) => setPriorityFilter(v)} options={[['all', 'All'], ['low', 'Low'], ['medium', 'Medium'], ['high', 'High'], ['urgent', 'Urgent']]} />
             <FilterChip label="Status" value={statusFilter} onChange={(v) => setStatusFilter(v)} options={[['all', 'All'], ...statusOrder.map((s) => [s, statusConfig[s].label])]} />
             <FilterChip label="Label" value={labelFilter} onChange={setLabelFilter} options={[['all', 'All'], ...allLabels.map((l) => [l, l])]} />
@@ -1197,81 +1244,81 @@ function TaskModal({ taskId, onClose }) {
         <div>
           <div className="flex items-start gap-3">
             <input value={task.title} onChange={(e) => updateTask(task.id, { title: e.target.value })} readOnly={isReadOnly}
-              className="flex-1 bg-transparent text-xl font-bold text-white focus:outline-none focus:bg-slate-800/40 rounded-lg px-2 py-1 -ml-2 transition-colors" />
-            {!isReadOnly && <button onClick={() => { deleteTask(task.id); onClose(); }} className="rounded-lg p-2 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"><Trash2 className="h-4 w-4" /></button>}
+              className="flex-1 bg-transparent text-xl font-bold text-slate-900 dark:text-white focus:outline-none focus:bg-slate-200/40 dark:focus:bg-slate-800/40 rounded-lg px-2 py-1 -ml-2 transition-colors" />
+            {!isReadOnly && <button onClick={() => { deleteTask(task.id); onClose(); }} className="rounded-lg p-2 text-slate-500 dark:text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"><Trash2 className="h-4 w-4" /></button>}
           </div>
           <div className="flex flex-wrap items-center gap-2 mt-2 px-0">
             <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium border ${p.badge}`}><span className={`h-1.5 w-1.5 rounded-full ${p.dot}`} />{p.label}</span>
-            {project && <span className="text-xs text-slate-500">· {project.name}</span>}
-            <span className="text-xs text-slate-600">· Created {formatDate(task.createdAt)}</span>
+            {project && <span className="text-xs text-slate-500 dark:text-slate-500">· {project.name}</span>}
+            <span className="text-xs text-slate-400 dark:text-slate-600">· Created {formatDate(task.createdAt)}</span>
           </div>
         </div>
 
         <div>
-          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Description</label>
+          <label className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider">Description</label>
           <textarea value={task.description} onChange={(e) => updateTask(task.id, { description: e.target.value })} readOnly={isReadOnly} rows={2} placeholder="Add a description…"
-            className="mt-1.5 w-full resize-none rounded-lg border border-slate-700/40 bg-slate-800/30 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-600 focus:border-indigo-500/40 focus:outline-none transition-colors" />
+            className="mt-1.5 w-full resize-none rounded-lg border border-slate-300/40 dark:border-slate-700/40 bg-slate-200/30 dark:bg-slate-800/30 px-3 py-2 text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-indigo-500/40 focus:outline-none transition-colors" />
         </div>
 
-        <div className="flex flex-wrap items-center gap-4 rounded-lg border border-slate-700/40 bg-slate-800/20 px-4 py-3">
+        <div className="flex flex-wrap items-center gap-4 rounded-lg border border-slate-300/40 dark:border-slate-700/40 bg-slate-200/20 dark:bg-slate-800/20 px-4 py-3">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-500">Priority</span>
+            <span className="text-xs text-slate-500 dark:text-slate-500">Priority</span>
             {isReadOnly ? <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-medium border ${p.badge}`}><span className={`h-1.5 w-1.5 rounded-full ${p.dot}`} />{p.label}</span>
               : <PrioritySelect value={task.priority} onChange={(v) => updateTask(task.id, { priority: v })} />}
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-slate-500">Status</span>
-            {isReadOnly ? <span className="text-sm font-medium text-slate-300">{task.status.replace('-', ' ')}</span>
+            <span className="text-xs text-slate-500 dark:text-slate-500">Status</span>
+            {isReadOnly ? <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{task.status.replace('-', ' ')}</span>
               : <StatusSelect value={task.status} onChange={(v) => updateTask(task.id, { status: v })} />}
           </div>
           <div className="flex items-center gap-2">
-            <Calendar className="h-3.5 w-3.5 text-slate-500" />
+            <Calendar className="h-3.5 w-3.5 text-slate-500 dark:text-slate-500" />
             <input type="date" value={task.dueDate || ''} onChange={(e) => updateTask(task.id, { dueDate: e.target.value || null })} disabled={isReadOnly}
-              className="rounded-lg border border-slate-700/40 bg-slate-800/30 px-2 py-1 text-xs text-slate-200 focus:border-indigo-500/40 focus:outline-none disabled:opacity-50" />
+              className="rounded-lg border border-slate-300/40 dark:border-slate-700/40 bg-slate-200/30 dark:bg-slate-800/30 px-2 py-1 text-xs text-slate-800 dark:text-slate-200 focus:border-indigo-500/40 focus:outline-none disabled:opacity-50" />
             {overdue && <span className="text-xs text-rose-400 font-medium">Overdue</span>}
           </div>
         </div>
 
         <div>
-          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Labels</label>
+          <label className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider">Labels</label>
           <div className="mt-1.5 flex flex-wrap gap-1.5">
-            {task.labels.map((l) => <span key={l} className="rounded-md bg-slate-800/60 border border-slate-700/40 px-2 py-1 text-xs text-slate-300">{l}</span>)}
-            {task.labels.length === 0 && <span className="text-xs text-slate-600">No labels</span>}
+            {task.labels.map((l) => <span key={l} className="rounded-md bg-slate-200/60 dark:bg-slate-800/60 border border-slate-300/40 dark:border-slate-700/40 px-2 py-1 text-xs text-slate-700 dark:text-slate-300">{l}</span>)}
+            {task.labels.length === 0 && <span className="text-xs text-slate-400 dark:text-slate-600">No labels</span>}
           </div>
         </div>
 
         <div>
           <div className="flex items-center gap-2 mb-2">
             <ListChecks className="h-4 w-4 text-indigo-400" />
-            <h3 className="text-sm font-semibold text-white">Subtasks</h3>
-            {task.subtasks.length > 0 && <span className="text-xs text-slate-500">{completedSubs}/{task.subtasks.length} done</span>}
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Subtasks</h3>
+            {task.subtasks.length > 0 && <span className="text-xs text-slate-500 dark:text-slate-500">{completedSubs}/{task.subtasks.length} done</span>}
           </div>
           <div className="space-y-1.5">
             {task.subtasks.map((sub) => (
-              <div key={sub.id} className="group flex items-center gap-2.5 rounded-lg px-2 py-1.5 hover:bg-slate-800/30 transition-colors">
-                <button onClick={() => toggleSubtask(task.id, sub.id)} disabled={isReadOnly} className="text-slate-500 hover:text-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+              <div key={sub.id} className="group flex items-center gap-2.5 rounded-lg px-2 py-1.5 hover:bg-slate-200/30 dark:hover:bg-slate-800/30 transition-colors">
+                <button onClick={() => toggleSubtask(task.id, sub.id)} disabled={isReadOnly} className="text-slate-500 dark:text-slate-500 hover:text-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                   {sub.completed ? <CheckCircle2 className="h-4 w-4 text-emerald-400" /> : <Circle className="h-4 w-4" />}
                 </button>
-                <span className={`text-sm flex-1 ${sub.completed ? 'text-slate-600 line-through' : 'text-slate-200'}`}>{sub.title}</span>
+                <span className={`text-sm flex-1 ${sub.completed ? 'text-slate-400 dark:text-slate-600 line-through' : 'text-slate-800 dark:text-slate-200'}`}>{sub.title}</span>
               </div>
             ))}
           </div>
           {!isReadOnly && (
             <div className="mt-2 flex items-center gap-2">
               <input value={newSubtask} onChange={(e) => setNewSubtask(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAddSubtask()} placeholder="Add a subtask…"
-                className="flex-1 rounded-lg border border-slate-700/40 bg-slate-800/30 px-3 py-1.5 text-sm text-slate-200 placeholder:text-slate-600 focus:border-indigo-500/40 focus:outline-none transition-colors" />
-              <button onClick={handleAddSubtask} disabled={!newSubtask.trim()} className="rounded-lg bg-slate-800/60 p-2 text-slate-400 hover:text-indigo-400 hover:bg-slate-800 disabled:opacity-30 transition-colors"><Plus className="h-4 w-4" /></button>
+                className="flex-1 rounded-lg border border-slate-300/40 dark:border-slate-700/40 bg-slate-200/30 dark:bg-slate-800/30 px-3 py-1.5 text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-indigo-500/40 focus:outline-none transition-colors" />
+              <button onClick={handleAddSubtask} disabled={!newSubtask.trim()} className="rounded-lg bg-slate-200/60 dark:bg-slate-800/60 p-2 text-slate-600 dark:text-slate-400 hover:text-indigo-400 hover:bg-slate-200 dark:hover:bg-slate-800 disabled:opacity-30 transition-colors"><Plus className="h-4 w-4" /></button>
             </div>
           )}
         </div>
 
         {task.attachments.length > 0 && (
           <div>
-            <div className="flex items-center gap-2 mb-2"><Paperclip className="h-4 w-4 text-indigo-400" /><h3 className="text-sm font-semibold text-white">Attachments</h3></div>
+            <div className="flex items-center gap-2 mb-2"><Paperclip className="h-4 w-4 text-indigo-400" /><h3 className="text-sm font-semibold text-slate-900 dark:text-white">Attachments</h3></div>
             <div className="flex flex-wrap gap-2">
               {task.attachments.map((att) => (
-                <div key={att.id} className="flex items-center gap-2 rounded-lg border border-slate-700/40 bg-slate-800/40 px-3 py-2">
-                  <FileText className="h-4 w-4 text-slate-400" />
+                <div key={att.id} className="flex items-center gap-2 rounded-lg border border-slate-300/40 dark:border-slate-700/40 bg-slate-200/40 dark:bg-slate-800/40 px-3 py-2">
+                  <FileText className="h-4 w-4 text-slate-600 dark:text-slate-400" />
                   <a href={att.data} download={att.name} className="text-xs text-indigo-400 hover:text-indigo-300">{att.name}</a>
                 </div>
               ))}
@@ -1280,15 +1327,15 @@ function TaskModal({ taskId, onClose }) {
         )}
 
         <div>
-          <div className="flex items-center gap-2 mb-3"><MessageSquare className="h-4 w-4 text-indigo-400" /><h3 className="text-sm font-semibold text-white">Comments & Activity</h3><span className="text-xs text-slate-500">{task.comments.length}</span></div>
+          <div className="flex items-center gap-2 mb-3"><MessageSquare className="h-4 w-4 text-indigo-400" /><h3 className="text-sm font-semibold text-slate-900 dark:text-white">Comments & Activity</h3><span className="text-xs text-slate-500 dark:text-slate-500">{task.comments.length}</span></div>
           <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
-            {task.comments.length === 0 && <p className="text-sm text-slate-600 py-2">No comments yet.</p>}
+            {task.comments.length === 0 && <p className="text-sm text-slate-400 dark:text-slate-600 py-2">No comments yet.</p>}
             {task.comments.map((c) => (
               <div key={c.id} className="flex gap-2.5">
                 <Avatar initials={c.authorAvatar} size="sm" />
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2"><span className="text-sm font-medium text-slate-200">{c.authorName}</span><span className="text-xs text-slate-500">{formatDate(c.createdAt)}</span></div>
-                  <p className="text-sm text-slate-400 mt-0.5">{renderMentions(c.text)}</p>
+                  <div className="flex items-center gap-2"><span className="text-sm font-medium text-slate-800 dark:text-slate-200">{c.authorName}</span><span className="text-xs text-slate-500 dark:text-slate-500">{formatDate(c.createdAt)}</span></div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5">{renderMentions(c.text)}</p>
                 </div>
               </div>
             ))}
@@ -1296,22 +1343,22 @@ function TaskModal({ taskId, onClose }) {
           {!isReadOnly && (
             <div className="relative mt-3">
               {showMentions && filteredUsers.length > 0 && (
-                <div className="absolute bottom-full left-0 mb-1 z-20 w-56 rounded-lg border border-slate-700/60 bg-slate-900 shadow-xl py-1 animate-fade-in">
+                <div className="absolute bottom-full left-0 mb-1 z-20 w-56 rounded-lg border border-slate-300/60 dark:border-slate-700/60 bg-slate-100 dark:bg-slate-900 shadow-xl py-1 animate-fade-in">
                   {filteredUsers.map((u, i) => (
-                    <button key={u.id} onClick={() => insertMention(u.name)} onMouseEnter={() => setActiveMentionIdx(i)} className={`flex w-full items-center gap-2 px-3 py-1.5 text-left transition-colors ${i === activeMentionIdx ? 'bg-slate-800' : ''}`}>
-                      <Avatar initials={u.avatar} size="sm" /><span className="text-sm text-slate-200">{u.name}</span>
+                    <button key={u.id} onClick={() => insertMention(u.name)} onMouseEnter={() => setActiveMentionIdx(i)} className={`flex w-full items-center gap-2 px-3 py-1.5 text-left transition-colors ${i === activeMentionIdx ? 'bg-slate-200 dark:bg-slate-800' : ''}`}>
+                      <Avatar initials={u.avatar} size="sm" /><span className="text-sm text-slate-800 dark:text-slate-200">{u.name}</span>
                     </button>
                   ))}
                 </div>
               )}
-              <div className="flex items-end gap-2 rounded-lg border border-slate-700/40 bg-slate-800/30 px-3 py-2 focus-within:border-indigo-500/40 transition-colors">
+              <div className="flex items-end gap-2 rounded-lg border border-slate-300/40 dark:border-slate-700/40 bg-slate-200/30 dark:bg-slate-800/30 px-3 py-2 focus-within:border-indigo-500/40 transition-colors">
                 <textarea ref={commentRef} value={commentText} onChange={handleCommentChange} onKeyDown={handleCommentKey} placeholder="Write a comment… Use @ to mention someone" rows={1}
-                  className="flex-1 resize-none bg-transparent text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none max-h-24" />
-                <button onClick={() => fileInputRef.current?.click()} className="rounded-md p-1.5 text-slate-500 hover:text-indigo-400 transition-colors" title="Attach file"><Paperclip className="h-4 w-4" /></button>
+                  className="flex-1 resize-none bg-transparent text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none max-h-24" />
+                <button onClick={() => fileInputRef.current?.click()} className="rounded-md p-1.5 text-slate-500 dark:text-slate-500 hover:text-indigo-400 transition-colors" title="Attach file"><Paperclip className="h-4 w-4" /></button>
                 <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileUpload} />
-                <button onClick={handleAddComment} disabled={!commentText.trim()} className="rounded-md p-1.5 text-slate-500 hover:text-indigo-400 disabled:opacity-30 transition-colors"><Send className="h-4 w-4" /></button>
+                <button onClick={handleAddComment} disabled={!commentText.trim()} className="rounded-md p-1.5 text-slate-500 dark:text-slate-500 hover:text-indigo-400 disabled:opacity-30 transition-colors"><Send className="h-4 w-4" /></button>
               </div>
-              <p className="mt-1 text-xs text-slate-600">⌘+Enter to send · @ to mention</p>
+              <p className="mt-1 text-xs text-slate-400 dark:text-slate-600">⌘+Enter to send · @ to mention</p>
             </div>
           )}
         </div>
@@ -1384,23 +1431,23 @@ function CommandPalette({ isOpen, onClose, onTaskClick, onTabChange, onSetWorksp
   return (
     <Modal isOpen={isOpen} onClose={onClose} maxWidth="max-w-xl">
       <div className="p-4">
-        <div className="flex items-center gap-3 rounded-xl border border-slate-700/50 bg-slate-800/40 px-4 py-3">
-          <Search className="h-5 w-5 text-slate-500" />
+        <div className="flex items-center gap-3 rounded-xl border border-slate-300/50 dark:border-slate-700/50 bg-slate-200/40 dark:bg-slate-800/40 px-4 py-3">
+          <Search className="h-5 w-5 text-slate-500 dark:text-slate-500" />
           <input ref={inputRef} value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={handleKey} placeholder="Search tasks, projects, or navigate…"
-            className="flex-1 bg-transparent text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none" />
-          <kbd className="rounded-md border border-slate-700/50 bg-slate-800 px-1.5 py-0.5 text-xs text-slate-500 font-mono">ESC</kbd>
+            className="flex-1 bg-transparent text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-500 dark:placeholder:text-slate-500 focus:outline-none" />
+          <kbd className="rounded-md border border-slate-300/50 dark:border-slate-700/50 bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 text-xs text-slate-500 dark:text-slate-500 font-mono">ESC</kbd>
         </div>
         <div className="mt-3 max-h-80 overflow-y-auto space-y-4">
           {filteredNav.length > 0 && (
             <div>
-              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider px-2 mb-1.5">{query ? 'Commands' : 'Quick Actions'}</p>
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider px-2 mb-1.5">{query ? 'Commands' : 'Quick Actions'}</p>
               {filteredNav.map((cmd) => {
                 const Icon = cmd.icon;
                 const idx = allItems.findIndex((a) => a.type === 'nav' && a.id === cmd.id);
                 return (
                   <button key={cmd.id} onClick={() => { cmd.action(); onClose(); }} onMouseEnter={() => setActiveIdx(idx)}
-                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors ${idx === activeIdx ? 'bg-slate-800/60' : 'hover:bg-slate-800/30'}`}>
-                    <Icon className="h-4 w-4 text-indigo-400" /><span className="text-sm text-slate-200 flex-1">{cmd.label}</span><ArrowRight className="h-3.5 w-3.5 text-slate-600" />
+                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors ${idx === activeIdx ? 'bg-slate-200/60 dark:bg-slate-800/60' : 'hover:bg-slate-200/30 dark:hover:bg-slate-800/30'}`}>
+                    <Icon className="h-4 w-4 text-indigo-400" /><span className="text-sm text-slate-800 dark:text-slate-200 flex-1">{cmd.label}</span><ArrowRight className="h-3.5 w-3.5 text-slate-400 dark:text-slate-600" />
                   </button>
                 );
               })}
@@ -1408,16 +1455,16 @@ function CommandPalette({ isOpen, onClose, onTaskClick, onTabChange, onSetWorksp
           )}
           {taskResults.length > 0 && (
             <div>
-              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider px-2 mb-1.5">Tasks</p>
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider px-2 mb-1.5">Tasks</p>
               {taskResults.map((t) => {
                 const idx = allItems.findIndex((a) => a.type === 'task' && a.id === t.id);
                 const project = projects.find((p) => p.id === t.projectId);
                 const p = priorityStyles[t.priority];
                 return (
                   <button key={t.id} onClick={() => { onTaskClick(t.id); onClose(); }} onMouseEnter={() => setActiveIdx(idx)}
-                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors ${idx === activeIdx ? 'bg-slate-800/60' : 'hover:bg-slate-800/30'}`}>
+                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors ${idx === activeIdx ? 'bg-slate-200/60 dark:bg-slate-800/60' : 'hover:bg-slate-200/30 dark:hover:bg-slate-800/30'}`}>
                     <span className={`h-2 w-2 shrink-0 rounded-full ${p.dot}`} />
-                    <div className="flex-1 min-w-0"><p className="text-sm text-slate-200 truncate">{t.title}</p><p className="text-xs text-slate-500">{project?.name} · {statusConfig[t.status].label}</p></div>
+                    <div className="flex-1 min-w-0"><p className="text-sm text-slate-800 dark:text-slate-200 truncate">{t.title}</p><p className="text-xs text-slate-500 dark:text-slate-500">{project?.name} · {statusConfig[t.status].label}</p></div>
                   </button>
                 );
               })}
@@ -1425,20 +1472,20 @@ function CommandPalette({ isOpen, onClose, onTaskClick, onTabChange, onSetWorksp
           )}
           {projectResults.length > 0 && (
             <div>
-              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider px-2 mb-1.5">Projects</p>
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider px-2 mb-1.5">Projects</p>
               {projectResults.map((p) => {
                 const idx = allItems.findIndex((a) => a.type === 'project' && a.id === p.id);
                 return (
                   <button key={p.id} onClick={() => { onTabChange('workspace'); onClose(); }} onMouseEnter={() => setActiveIdx(idx)}
-                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors ${idx === activeIdx ? 'bg-slate-800/60' : 'hover:bg-slate-800/30'}`}>
+                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left transition-colors ${idx === activeIdx ? 'bg-slate-200/60 dark:bg-slate-800/60' : 'hover:bg-slate-200/30 dark:hover:bg-slate-800/30'}`}>
                     <KanbanSquare className="h-4 w-4 text-sky-400" />
-                    <div className="flex-1 min-w-0"><p className="text-sm text-slate-200 truncate">{p.name}</p><p className="text-xs text-slate-500">{p.description}</p></div>
+                    <div className="flex-1 min-w-0"><p className="text-sm text-slate-800 dark:text-slate-200 truncate">{p.name}</p><p className="text-xs text-slate-500 dark:text-slate-500">{p.description}</p></div>
                   </button>
                 );
               })}
             </div>
           )}
-          {allItems.length === 0 && <div className="py-8 text-center text-sm text-slate-500">No results for "{query}"</div>}
+          {allItems.length === 0 && <div className="py-8 text-center text-sm text-slate-500 dark:text-slate-500">No results for "{query}"</div>}
         </div>
       </div>
     </Modal>
@@ -1478,49 +1525,49 @@ function QuickAddModal({ isOpen, onClose }) {
     <Modal isOpen={isOpen} onClose={onClose} maxWidth="max-w-lg" title="Quick Add Task">
       <div className="p-6 space-y-4">
         <div>
-          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Title</label>
+          <label className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider">Title</label>
           <input ref={titleRef} value={title} onChange={(e) => setTitle(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSubmit()} placeholder="What needs to be done?"
-            className="mt-1.5 w-full rounded-lg border border-slate-700/40 bg-slate-800/30 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-600 focus:border-indigo-500/40 focus:outline-none transition-colors" />
+            className="mt-1.5 w-full rounded-lg border border-slate-300/40 dark:border-slate-700/40 bg-slate-200/30 dark:bg-slate-800/30 px-3 py-2 text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-indigo-500/40 focus:outline-none transition-colors" />
         </div>
         <div>
-          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Description</label>
+          <label className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider">Description</label>
           <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} placeholder="Add details…"
-            className="mt-1.5 w-full resize-none rounded-lg border border-slate-700/40 bg-slate-800/30 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-600 focus:border-indigo-500/40 focus:outline-none transition-colors" />
+            className="mt-1.5 w-full resize-none rounded-lg border border-slate-300/40 dark:border-slate-700/40 bg-slate-200/30 dark:bg-slate-800/30 px-3 py-2 text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-indigo-500/40 focus:outline-none transition-colors" />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Project</label>
-            <select value={projectId} onChange={(e) => setProjectId(e.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-700/40 bg-slate-800/30 px-3 py-2 text-sm text-slate-200 focus:border-indigo-500/40 focus:outline-none cursor-pointer">
+            <label className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider">Project</label>
+            <select value={projectId} onChange={(e) => setProjectId(e.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-300/40 dark:border-slate-700/40 bg-slate-200/30 dark:bg-slate-800/30 px-3 py-2 text-sm text-slate-800 dark:text-slate-200 focus:border-indigo-500/40 focus:outline-none cursor-pointer">
               {projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Due Date</label>
-            <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-700/40 bg-slate-800/30 px-3 py-2 text-sm text-slate-200 focus:border-indigo-500/40 focus:outline-none" />
+            <label className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider">Due Date</label>
+            <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-300/40 dark:border-slate-700/40 bg-slate-200/30 dark:bg-slate-800/30 px-3 py-2 text-sm text-slate-800 dark:text-slate-200 focus:border-indigo-500/40 focus:outline-none" />
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Priority</label>
-            <select value={priority} onChange={(e) => setPriority(e.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-700/40 bg-slate-800/30 px-3 py-2 text-sm text-slate-200 focus:border-indigo-500/40 focus:outline-none cursor-pointer">
+            <label className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider">Priority</label>
+            <select value={priority} onChange={(e) => setPriority(e.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-300/40 dark:border-slate-700/40 bg-slate-200/30 dark:bg-slate-800/30 px-3 py-2 text-sm text-slate-800 dark:text-slate-200 focus:border-indigo-500/40 focus:outline-none cursor-pointer">
               <option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option><option value="urgent">Urgent</option>
             </select>
           </div>
           <div>
-            <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Status</label>
-            <select value={status} onChange={(e) => setStatus(e.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-700/40 bg-slate-800/30 px-3 py-2 text-sm text-slate-200 focus:border-indigo-500/40 focus:outline-none cursor-pointer">
+            <label className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider">Status</label>
+            <select value={status} onChange={(e) => setStatus(e.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-300/40 dark:border-slate-700/40 bg-slate-200/30 dark:bg-slate-800/30 px-3 py-2 text-sm text-slate-800 dark:text-slate-200 focus:border-indigo-500/40 focus:outline-none cursor-pointer">
               <option value="todo">To Do</option><option value="in-progress">In Progress</option><option value="review">In Review</option><option value="done">Done</option>
             </select>
           </div>
         </div>
         <div>
-          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Labels (comma-separated)</label>
+          <label className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider">Labels (comma-separated)</label>
           <input value={labels} onChange={(e) => setLabels(e.target.value)} placeholder="e.g. frontend, bug"
-            className="mt-1.5 w-full rounded-lg border border-slate-700/40 bg-slate-800/30 px-3 py-2 text-sm text-slate-200 placeholder:text-slate-600 focus:border-indigo-500/40 focus:outline-none transition-colors" />
+            className="mt-1.5 w-full rounded-lg border border-slate-300/40 dark:border-slate-700/40 bg-slate-200/30 dark:bg-slate-800/30 px-3 py-2 text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:border-indigo-500/40 focus:outline-none transition-colors" />
         </div>
         <div className="flex items-center justify-end gap-2 pt-2">
-          <button onClick={onClose} className="rounded-lg px-4 py-2 text-sm font-medium text-slate-400 hover:text-slate-200 transition-colors">Cancel</button>
-          <button onClick={handleSubmit} disabled={!title.trim()} className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-indigo-500/20 hover:scale-[1.02] disabled:opacity-40 disabled:hover:scale-100 transition-all">
+          <button onClick={onClose} className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors">Cancel</button>
+          <button onClick={handleSubmit} disabled={!title.trim()} className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-600 px-4 py-2 text-sm font-medium text-slate-900 dark:text-white shadow-lg shadow-indigo-500/20 hover:scale-[1.02] disabled:opacity-40 disabled:hover:scale-100 transition-all">
             <Plus className="h-4 w-4" />Create Task
           </button>
         </div>
@@ -1547,6 +1594,7 @@ function SettingsView() {
   const [avatar, setAvatar] = useState(profile.avatar);
   const [defaultView, setDefaultView] = useState(profile.defaultView);
   const [saved, setSaved] = useState(false);
+  const {user} = userAuth();
 
   const handleSave = () => { updateProfile({ name, email, avatar, defaultView }); setSaved(true); setTimeout(() => setSaved(false), 2000); };
 
@@ -1554,24 +1602,24 @@ function SettingsView() {
     <div className="max-w-2xl space-y-6">
       <div className="flex items-center gap-4">
         <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/20 to-violet-500/10 border border-indigo-500/20"><User className="h-7 w-7 text-indigo-400" /></div>
-        <div><h2 className="text-xl font-bold text-white">Profile Settings</h2><p className="text-sm text-slate-400">Manage your account and workspace preferences.</p></div>
+        <div><h2 className="text-xl font-bold text-slate-900 dark:text-white">Profile Settings</h2><p className="text-sm text-slate-600 dark:text-slate-400">Manage your account and workspace preferences.</p></div>
       </div>
 
-      <div className="rounded-2xl border border-slate-800/60 bg-slate-900/60 backdrop-blur-xl p-5 space-y-4">
-        <h3 className="text-sm font-semibold text-white">Account</h3>
+      <div className="rounded-2xl border border-slate-200/60 dark:border-slate-800/60 bg-slate-100/60 dark:bg-slate-900/60 backdrop-blur-xl p-5 space-y-4">
+        <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Account</h3>
         <div>
-          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Display Name</label>
-          <input value={name} onChange={(e) => setName(e.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-700/40 bg-slate-800/30 px-3 py-2 text-sm text-slate-200 focus:border-indigo-500/40 focus:outline-none transition-colors" />
+          <label className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider">Display Name</label>
+          <input value={user.name} onChange={(e) => setName(e.target.value)} className="mt-1.5 w-full rounded-lg border border-slate-300/40 dark:border-slate-700/40 bg-slate-200/30 dark:bg-slate-800/30 px-3 py-2 text-sm text-slate-800 dark:text-slate-200 focus:border-indigo-500/40 focus:outline-none transition-colors" />
         </div>
         <div>
-          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Email</label>
-          <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" className="mt-1.5 w-full rounded-lg border border-slate-700/40 bg-slate-800/30 px-3 py-2 text-sm text-slate-200 focus:border-indigo-500/40 focus:outline-none transition-colors" />
+          <label className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider">Email</label>
+          <input value={user.email} onChange={(e) => setEmail(e.target.value)} type="email" className="mt-1.5 w-full rounded-lg border border-slate-300/40 dark:border-slate-700/40 bg-slate-200/30 dark:bg-slate-800/30 px-3 py-2 text-sm text-slate-800 dark:text-slate-200 focus:border-indigo-500/40 focus:outline-none transition-colors" />
         </div>
         <div>
-          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Avatar Initials</label>
+          <label className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider">Avatar Initials</label>
           <div className="mt-2 flex flex-wrap gap-2">
             {avatarChoices.map((a) => (
-              <button key={a} onClick={() => setAvatar(a)} className={`flex h-9 w-9 items-center justify-center rounded-xl text-xs font-bold transition-all ${avatar === a ? 'bg-indigo-500 text-white ring-2 ring-indigo-400 ring-offset-2 ring-offset-slate-900' : 'bg-slate-800 text-slate-400 hover:text-white'}`}>
+              <button key={a} onClick={() => setAvatar(a)} className={`flex h-9 w-9 items-center justify-center rounded-xl text-xs font-bold transition-all ${avatar === a ? 'bg-indigo-500 text-slate-900 dark:text-white ring-2 ring-indigo-400 ring-offset-2 ring-offset-slate-100 dark:ring-offset-slate-900' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}>
                 {a}
               </button>
             ))}
@@ -1579,15 +1627,15 @@ function SettingsView() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-slate-800/60 bg-slate-900/60 backdrop-blur-xl p-5 space-y-4">
-        <h3 className="text-sm font-semibold text-white">Preferences</h3>
+      <div className="rounded-2xl border border-slate-200/60 dark:border-slate-800/60 bg-slate-100/60 dark:bg-slate-900/60 backdrop-blur-xl p-5 space-y-4">
+        <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Preferences</h3>
         <div>
-          <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Default Workspace View</label>
+          <label className="text-xs font-medium text-slate-500 dark:text-slate-500 uppercase tracking-wider">Default Workspace View</label>
           <div className="mt-2 grid grid-cols-3 gap-3">
             {viewOptions.map((v) => {
               const Icon = v.icon;
               return (
-                <button key={v.id} onClick={() => setDefaultView(v.id)} className={`flex flex-col items-center gap-2 rounded-xl border p-3 text-center transition-all ${defaultView === v.id ? 'border-indigo-500/40 bg-indigo-500/10 text-indigo-300' : 'border-slate-800 bg-slate-800/30 text-slate-400 hover:text-slate-200'}`}>
+                <button key={v.id} onClick={() => setDefaultView(v.id)} className={`flex flex-col items-center gap-2 rounded-xl border p-3 text-center transition-all ${defaultView === v.id ? 'border-indigo-500/40 bg-indigo-500/10 text-indigo-300' : 'border-slate-200 dark:border-slate-800 bg-slate-200/30 dark:bg-slate-800/30 text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
                   <Icon className="h-5 w-5" /><span className="text-xs font-medium">{v.label}</span>
                 </button>
               );
@@ -1596,18 +1644,18 @@ function SettingsView() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-slate-800/60 bg-slate-900/60 backdrop-blur-xl p-5 space-y-4">
-        <h3 className="text-sm font-semibold text-white">Data & Backup</h3>
+      <div className="rounded-2xl border border-slate-200/60 dark:border-slate-800/60 bg-slate-100/60 dark:bg-slate-900/60 backdrop-blur-xl p-5 space-y-4">
+        <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Data & Backup</h3>
         <div className="flex items-center justify-between">
-          <div><p className="text-sm font-medium text-slate-200">Export Workspace Data</p><p className="text-xs text-slate-500">Download a JSON backup of your tasks and settings.</p></div>
-          <button onClick={exportData} className="flex items-center gap-1.5 rounded-lg border border-slate-700/50 bg-slate-800/50 px-3 py-2 text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors">
+          <div><p className="text-sm font-medium text-slate-800 dark:text-slate-200">Export Workspace Data</p><p className="text-xs text-slate-500 dark:text-slate-500">Download a JSON backup of your tasks and settings.</p></div>
+          <button onClick={exportData} className="flex items-center gap-1.5 rounded-lg border border-slate-300/50 dark:border-slate-700/50 bg-slate-200/50 dark:bg-slate-800/50 px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
             <Download className="h-4 w-4" />Export JSON
           </button>
         </div>
       </div>
 
       <div className="flex items-center justify-end gap-3 pt-2">
-        <button onClick={handleSave} className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-indigo-500/20 hover:scale-[1.02] transition-all">
+        <button onClick={handleSave} className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-5 py-2.5 text-sm font-medium text-slate-900 dark:text-white shadow-lg shadow-indigo-500/20 hover:scale-[1.02] transition-all">
           <Save className="h-4 w-4" />{saved ? 'Saved!' : 'Save Changes'}
         </button>
       </div>
@@ -1635,7 +1683,7 @@ function UserDashboardContent() {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-indigo-500/30 selection:text-indigo-200">
+    <div className="flex min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-indigo-500/30 selection:text-indigo-200">
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} isMobileOpen={isMobileSidebarOpen} onMobileClose={() => setIsMobileSidebarOpen(false)} unreadCount={0} />
 
       <div className="flex flex-1 flex-col min-w-0">

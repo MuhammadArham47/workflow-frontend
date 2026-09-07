@@ -72,7 +72,10 @@ import {
   Sparkles,
   Cpu,
   Megaphone,
+  LogOut,
 } from 'lucide-react';
+import { userAuth } from '../../../context/Auths';
+import { useNavigate } from 'react-router-dom';
 
 // ============================================================
 // UTILITIES
@@ -147,8 +150,8 @@ const mockUsers = [
 ];
 
 const mockWorkspaces = [
-  { id: 'w1', name: 'Product Engineering', icon: <Cpu /> },
-  { id: 'w2', name: 'Marketing Hub', icon: <Megaphone /> },
+  { id: 'w1', name: 'Product Engineering', icon: '🚀' },
+  { id: 'w2', name: 'Marketing Hub', icon: '📱' },
   { id: 'w3', name: 'Client Portal', icon: '💼' },
 ];
 
@@ -610,7 +613,7 @@ const AdminDashboard = () => {
 
   // Theme class
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', state.theme === 'dark');
+    document.documentElement.classList.toggle('dark', state.theme === 'light');
     document.body.className = state.theme === 'dark' ? 'bg-slate-950' : 'bg-slate-100';
   }, [state.theme]);
 
@@ -892,7 +895,7 @@ const AdminDashboard = () => {
     { id: 'settings', label: 'Settings', icon: SettingsIcon },
   ];
 
-  const isDark = state.theme === 'dark';
+  const isDark = state.theme === 'light';
   const cardClass = isDark ? 'bg-slate-900/80 border border-slate-800 backdrop-blur-md' : 'bg-white/80 border border-slate-200 backdrop-blur-md';
   const textPrimary = isDark ? 'text-slate-100' : 'text-slate-900';
   const textSecondary = isDark ? 'text-slate-400' : 'text-slate-500';
@@ -1238,6 +1241,19 @@ const Sidebar = ({
   showWorkspaceSwitcher, setShowWorkspaceSwitcher, onNewTask, onNewWorkspace,
   isOnline, unreadCount, showRoleSwitcher, setShowRoleSwitcher, onSwitchUser, users,
 }) => {
+  const {logoutUser} = userAuth();
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    try {
+      let res = await logoutUser();
+      if (res.success) {
+        navigate('/auth/login', { replace: true });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <>
       <aside className={`fixed top-0 left-0 h-full z-40 ${cardClass} border-r ${isDark ? 'border-slate-800' : 'border-slate-200'} transition-all duration-300 ${collapsed ? 'w-16' : 'w-64'} ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
@@ -1331,7 +1347,7 @@ const Sidebar = ({
           <div className="px-3 py-3 space-y-2 border-t" style={{ borderTopColor: isDark ? '#1e293b' : '#e2e8f0' }}>
             <button
               onClick={onNewTask}
-              className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-indigo-500 text-white text-sm font-medium hover:bg-indigo-600 transition-colors ${collapsed ? 'justify-center' : ''}`}
+              className={`w-full flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg bg-indigo-500 text-white text-sm font-medium hover:bg-indigo-600 transition-colors ${collapsed ? 'justify-center' : ''}`}
             >
               <Plus size={16} />
               {!collapsed && 'New Task'}
@@ -1357,7 +1373,7 @@ const Sidebar = ({
               <>
                 <button
                   onClick={() => setShowRoleSwitcher(!showRoleSwitcher)}
-                  className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg ${hoverBg}`}
+                  className={`w-full flex items-center cursor-pointer gap-2 px-2 py-2 rounded-lg ${hoverBg}`}
                 >
                   <Avatar user={currentUser} size={36} />
                   <div className="flex-1 text-left min-w-0">
@@ -1367,13 +1383,13 @@ const Sidebar = ({
                   <ChevronDown size={16} className={textMuted} />
                 </button>
                 {showRoleSwitcher && (
-                  <div className={`absolute bottom-full left-3 right-3 mb-1 ${cardClass} rounded-lg shadow-xl z-50 overflow-hidden`}>
+                  <div className={`absolute bottom-full left-3 cursor-pointer right-3 mb-1 ${cardClass} rounded-lg shadow-xl z-50 overflow-hidden`}>
                     <div className={`px-3 py-2 text-xs font-semibold ${textMuted} uppercase`}>Switch User (Demo)</div>
                     {users.map((u) => (
                       <button
                         key={u.id}
                         onClick={() => onSwitchUser(u.id)}
-                        className={`w-full flex items-center gap-2 px-3 py-2 text-sm ${hoverBg} ${textPrimary} text-left`}
+                        className={`w-full flex items-center gap-2 cursor-pointer px-3 py-2 text-sm ${hoverBg} ${textPrimary} text-left`}
                       >
                         <Avatar user={u} size={24} />
                         <span className="truncate flex-1">{u.name}</span>
@@ -1388,6 +1404,29 @@ const Sidebar = ({
                 <Avatar user={currentUser} size={32} />
               </div>
             )}
+          </div>
+
+          <div className="px-3 py-3 space-y-2 border-t" style={{ borderTopColor: isDark ? '#1e293b' : '#e2e8f0' }}>
+            <button
+              onClick={()=> handleLogout()}
+              className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-red-500 cursor-pointer text-white text-sm font-medium hover:bg-red-600 transition-colors ${collapsed ? 'justify-center' : ''}`}
+            >
+              <LogOut size={16} />
+              {!collapsed && 'Logout'}
+            </button>
+
+            {/* {!collapsed && (
+              <div className="flex items-center justify-between px-1">
+                <div className="flex items-center gap-1.5 text-xs">
+                  {isOnline ? <Wifi size={14} className="text-emerald-400" /> : <WifiOff size={14} className="text-red-400" />}
+                  <span className={isOnline ? 'text-emerald-400' : 'text-red-400'}>{isOnline ? 'Online' : 'Offline'}</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-xs">
+                  <HardDrive size={14} className={textMuted} />
+                  <span className={textMuted}>Local</span>
+                </div>
+              </div>
+            )} */}
           </div>
 
           {/* Collapse toggle */}
