@@ -76,7 +76,7 @@ const Auths = ({ children }) => {
 
   const logoutUser = async () => {
     try {
-      const response = await axios.delete(`https://workflow-backend-api.vercel.app/api/auth/userdelete`, userData);
+      const response = await axios.delete(`https://workflow-backend-api.vercel.app/api/auth/userdelete`);
 
       const { success, message, isError } = response.data;
 
