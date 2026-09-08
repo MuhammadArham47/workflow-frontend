@@ -19,6 +19,7 @@ const ThemeContext = createContext({ theme: 'dark', toggle: () => {} })
 
 function ThemeProvider({ children }) {
   const [theme, setTheme] = useState('dark')
+  localStorage.setItem('theme', theme)
   useEffect(() => {
     const root = document.documentElement
     if (theme === 'dark') root.classList.add('dark')
@@ -40,7 +41,7 @@ function SectionHeading({ eyebrow, title, subtitle, align = 'center' }) {
           {eyebrow}
         </span>
       )}
-      <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl text-balance">
+      <h2 className="text-3xl font-bold tracking-tight text-base-primary sm:text-4xl md:text-5xl text-balance">
         {title}
       </h2>
       {subtitle && (
@@ -91,21 +92,21 @@ function Navbar() {
 
           <div className="hidden md:flex items-center gap-1">
             {navLinks.map((l) => (
-              <a key={l.label} href={l.href} className="px-3 py-2 text-sm font-medium text-slate-300 rounded-lg transition-all hover:text-white hover:bg-white/5">
+              <a key={l.label} href={l.href} className="px-3 py-2 text-sm font-medium text-base-secondary rounded-lg transition-all hover:text-base-primary hover:bg-white/5">
                 {l.label}
               </a>
             ))}
           </div>
 
           <div className="flex items-center gap-2">
-            <button onClick={toggle} aria-label="Toggle theme" className="p-2 rounded-lg glass text-slate-300 hover:text-white transition-colors">
+            <button onClick={toggle} aria-label="Toggle theme" className="p-2 rounded-lg glass text-base-secondary hover:text-base-primary transition-colors">
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
             <Link to="/auth/login" className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold text-white rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:shadow-[0_0_25px_rgba(139,92,246,0.5)] transition-all hover:scale-105">
               <Sparkles className="w-4 h-4" />
               Login
             </Link>
-            <button onClick={() => setMobileOpen((o) => !o)} className="md:hidden p-2 rounded-lg glass text-slate-300" aria-label="Menu">
+            <button onClick={() => setMobileOpen((o) => !o)} className="md:hidden p-2 rounded-lg glass text-base-secondary" aria-label="Menu">
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
@@ -122,12 +123,12 @@ function Navbar() {
           >
             <div className="px-4 py-3 space-y-1">
               {navLinks.map((l) => (
-                <a key={l.label} href={l.href} onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-300 rounded-lg hover:bg-white/5 hover:text-white">
+                <a key={l.label} href={l.href} onClick={() => setMobileOpen(false)} className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-base-secondary rounded-lg hover:bg-white/5 hover:text-base-primary">
                   <l.icon className="w-4 h-4 text-purple-400" />
                   {l.label}
                 </a>
               ))}
-              <Link to="/auth/login" onClick={() => setMobileOpen(false)} className="flex items-center justify-center gap-1.5 px-4 py-2.5 mt-2 text-sm font-semibold text-white rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+              <Link to="/auth/login" onClick={() => setMobileOpen(false)} className="flex items-center justify-center gap-1.5 px-4 py-2.5 mt-2 text-sm font-semibold text-base-primary rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
                 <LogIn className="w-4 h-4" />
                 Live Demo
                 <ArrowRight className="w-4 h-4" />
@@ -195,7 +196,7 @@ function AppPreview() {
 
       <div className="flex h-[420px] sm:h-[460px]">
         <div className="hidden sm:flex flex-col w-14 lg:w-48 border-r border-white/10 bg-white/[0.02] p-2 gap-1">
-          <div className="flex items-center gap-2 px-2 py-2 rounded-lg bg-indigo-500/15 text-indigo-300">
+          <div className="flex items-center gap-2 px-2 py-2 rounded-lg bg-indigo-500/15 text-indigo-600 dark:text-indigo-600">
             <Layout className="w-4 h-4 shrink-0" />
             <span className="hidden lg:inline text-sm font-medium">Board</span>
           </div>
@@ -220,7 +221,7 @@ function AppPreview() {
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
             <div>
-              <h3 className="text-sm font-semibold text-white">Sprint 24 — Q3 Launch</h3>
+              <h3 className="text-sm font-semibold text-base-primary">Sprint 24 — Q3 Launch</h3>
               <p className="text-xs text-slate-500">8 tasks · 3 in progress</p>
             </div>
             <div className="flex items-center gap-2">
@@ -245,7 +246,7 @@ function AppPreview() {
                 <div key={col.title} className="w-48 lg:w-52 flex flex-col">
                   <div className="flex items-center gap-2 px-2 py-1.5 mb-2">
                     <div className={`w-2 h-2 rounded-full ${col.accent}`} />
-                    <span className="text-xs font-semibold text-slate-300">{col.title}</span>
+                    <span className="text-xs font-semibold text-base-secondary">{col.title}</span>
                     <span className="text-xs text-slate-600">{col.cards.length}</span>
                   </div>
                   <div className="flex flex-col gap-2">
@@ -263,7 +264,7 @@ function AppPreview() {
                           </span>
                           <PriorityIcon priority={card.priority} />
                         </div>
-                        <p className="text-xs font-medium text-slate-200 leading-snug mb-2">{card.title}</p>
+                        <p className="text-xs font-medium text-base-primary leading-snug mb-2">{card.title}</p>
                         <div className="flex items-center gap-2 text-[10px] text-slate-500">
                           <span className="flex items-center gap-0.5"><CheckCircle2 className="w-3 h-3" /> 2/4</span>
                           <span className="flex items-center gap-0.5"><MessageCircle className="w-3 h-3" /> 3</span>
@@ -315,14 +316,14 @@ function Hero() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="flex justify-center mb-8">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-sm font-medium text-purple-200 hover:border-purple-500/30 transition-colors group">
-            <Sparkles className="w-4 h-4 text-purple-400 animate-pulse" />
-            <span>The All-in-One Local-First Workspace Tool</span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-sm font-medium text-purple-600 dark:text-purple-200 hover:border-purple-500/30 transition-colors group">
+            <Sparkles className="w-4 h-4 animate-pulse text-purple-500 dark:text-purple-400" />
+            <span className='text-purple-500 dark:text-purple-400'>The All-in-One Local-First Workspace Tool</span>
             <span className="px-1.5 py-0.5 text-[10px] font-bold rounded bg-gradient-to-r from-indigo-500 to-pink-500 text-white">NEW</span>
           </div>
         </motion.div>
 
-        <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }} className="text-center text-4xl font-extrabold tracking-tight text-white sm:text-6xl md:text-7xl text-balance">
+        <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }} className="text-center text-4xl font-extrabold tracking-tight text-base-primary sm:text-6xl md:text-7xl text-balance">
           Manage Projects at the
           <br />
           <span className="gradient-text-animated">Speed of Thought</span>
@@ -338,7 +339,7 @@ function Hero() {
             Launch Workspace
             <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
           </a>
-          <a href="#features" className="inline-flex items-center gap-2 px-7 py-3.5 text-base font-semibold text-white rounded-2xl glass hover:bg-white/10 transition-all hover:scale-105">
+          <a href="#features" className="inline-flex items-center gap-2 px-7 py-3.5 text-base font-semibold text-base-primary rounded-2xl glass hover:bg-white/10 transition-all hover:scale-105">
             <Play className="w-4 h-4 text-purple-400" />
             Explore Features
           </a>
@@ -394,13 +395,13 @@ function Features() {
               <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${f.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300 -z-10`} />
               <div className={`absolute -inset-px rounded-2xl bg-gradient-to-br ${f.gradient} opacity-0 group-hover:opacity-30 blur-sm transition-opacity duration-300 -z-10`} />
               <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${f.gradient} mb-4 shadow-lg`}>
-                <f.icon className="w-6 h-6 text-white" />
+                <f.icon className="w-6 h-6 text-base-primary" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">{f.title}</h3>
+              <h3 className="text-lg font-bold text-base-primary mb-2">{f.title}</h3>
               <p className="text-sm text-slate-400 leading-relaxed mb-4">{f.desc}</p>
               <div className="flex flex-wrap gap-1.5">
                 {f.points.map((p) => (
-                  <span key={p} className="px-2 py-0.5 text-[11px] font-medium rounded-md bg-white/5 text-slate-300 border border-white/10">{p}</span>
+                  <span key={p} className="px-2 py-0.5 text-[11px] font-medium rounded-md bg-white/5 text-base-secondary border border-white/10">{p}</span>
                 ))}
               </div>
             </motion.div>
@@ -441,7 +442,7 @@ function KanbanView() {
         <div key={c.title} className="w-44 sm:w-52 shrink-0">
           <div className="flex items-center gap-2 mb-2 px-1">
             <div className={`w-2 h-2 rounded-full ${c.accent}`} />
-            <span className="text-xs font-semibold text-slate-300">{c.title}</span>
+            <span className="text-xs font-semibold text-base-secondary">{c.title}</span>
             <span className="text-xs text-slate-600">{c.cards.length}</span>
           </div>
           <div className="space-y-2">
@@ -451,7 +452,7 @@ function KanbanView() {
                   <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${tc[card.tag]}`}>{card.tag}</span>
                   <Flag className={`w-3 h-3 ${pc[card.p]} fill-current/20`} />
                 </div>
-                <p className="text-xs font-medium text-slate-200 mb-2">{card.t}</p>
+                <p className="text-xs font-medium text-base-primary mb-2">{card.t}</p>
                 <div className="flex items-center gap-2 text-[10px] text-slate-500">
                   <CheckCircle2 className="w-3 h-3" /> 1/3
                   <Clock className="w-3 h-3 ml-auto" /> Sep 15
@@ -492,7 +493,7 @@ function TableView() {
           {rows.map((r, i) => (
             <motion.tr key={r.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.05 }} className="border-b border-white/5 hover:bg-white/5 transition-colors">
               <td className="py-2.5 text-xs text-slate-500 font-mono">{r.id}</td>
-              <td className="py-2.5 text-xs font-medium text-slate-200">{r.title}</td>
+              <td className="py-2.5 text-xs font-medium text-base-primary">{r.title}</td>
               <td className="py-2.5"><span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${sc[r.status]}`}>{r.status}</span></td>
               <td className="py-2.5"><span className={`flex items-center gap-1 text-xs ${pc[r.priority]}`}><Flag className="w-3 h-3" />{r.priority}</span></td>
               <td className="py-2.5"><div className={`w-6 h-6 rounded-full bg-gradient-to-br ${r.assignee}`} /></td>
@@ -519,7 +520,7 @@ function CalendarView() {
   return (
     <div className="p-4 h-full">
       <div className="flex items-center justify-between mb-3">
-        <h4 className="text-sm font-semibold text-white">September 2026</h4>
+        <h4 className="text-sm font-semibold text-base-primary">September 2026</h4>
         <div className="flex gap-1">
           <button className="p-1 rounded glass text-slate-400 text-xs">‹</button>
           <button className="p-1 rounded glass text-slate-400 text-xs">›</button>
@@ -533,7 +534,7 @@ function CalendarView() {
           <div key={i} className={`min-h-[3rem] sm:min-h-[3.5rem] rounded-lg border p-1 text-[10px] ${d ? 'border-white/10 bg-white/[0.02]' : 'border-transparent'} ${d === 5 ? 'ring-1 ring-purple-500/50 bg-purple-500/5' : ''}`}>
             {d && <span className="text-slate-400">{d}</span>}
             {d && events[d] && (
-              <div className={`mt-1 px-1 py-0.5 rounded text-[9px] text-white truncate ${events[d].color}`}>{events[d].title}</div>
+              <div className={`mt-1 px-1 py-0.5 rounded text-[9px] text-base-primary truncate ${events[d].color}`}>{events[d].title}</div>
             )}
           </div>
         ))}
@@ -557,7 +558,7 @@ function AnalyticsView() {
           <motion.div key={s.label} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.08 }} className="p-3 rounded-xl glass">
             <p className="text-xs text-slate-500">{s.label}</p>
             <div className="flex items-baseline gap-2 mt-1">
-              <span className="text-2xl font-bold text-white">{s.value}</span>
+              <span className="text-2xl font-bold text-base-primary">{s.value}</span>
               <span className={`text-xs font-medium ${s.color}`}>{s.change}</span>
             </div>
           </motion.div>
@@ -565,7 +566,7 @@ function AnalyticsView() {
       </div>
       <div className="p-4 rounded-xl glass">
         <div className="flex items-center justify-between mb-4">
-          <h4 className="text-sm font-semibold text-white">Velocity (last 12 weeks)</h4>
+          <h4 className="text-sm font-semibold text-base-primary">Velocity (last 12 weeks)</h4>
           <span className="flex items-center gap-1 text-xs text-emerald-400"><TrendingUp className="w-3 h-3" /> +18%</span>
         </div>
         <div className="flex items-end gap-1.5 h-32">
@@ -597,7 +598,7 @@ function FeatureTabs() {
         <div className="flex justify-center mt-10">
           <div className="inline-flex flex-wrap justify-center gap-1 p-1.5 rounded-2xl glass-strong">
             {tabDefs.map((t) => (
-              <button key={t.id} onClick={() => setActive(t.id)} className={`relative flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl transition-colors ${active === t.id ? 'text-white' : 'text-slate-400 hover:text-white'}`}>
+              <button key={t.id} onClick={() => setActive(t.id)} className={`relative flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl transition-colors ${active === t.id ? 'text-white' : 'text-slate-400 hover:text-base-primary'}`}>
                 {active === t.id && (
                   <motion.div layoutId="tab-bg" className="absolute inset-0 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" transition={{ type: 'spring', stiffness: 300, damping: 30 }} />
                 )}
@@ -663,7 +664,7 @@ function TechStack() {
               <div className={`inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br ${s.bg} mb-3`}>
                 <s.icon className={`w-5 h-5 ${s.color}`} />
               </div>
-              <h4 className="text-sm font-bold text-white mb-1">{s.name}</h4>
+              <h4 className="text-sm font-bold text-base-primary mb-1">{s.name}</h4>
               <p className="text-xs text-slate-500 leading-relaxed">{s.desc}</p>
             </motion.div>
           ))}
@@ -681,10 +682,10 @@ function CTA() {
         <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="relative overflow-hidden rounded-3xl glass-strong p-8 sm:p-12 md:p-16 text-center">
           <div className="absolute inset-0 -z-10 bg-gradient-to-br from-indigo-600/20 via-purple-600/20 to-pink-600/20" />
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-purple-600/20 rounded-full blur-[100px] -z-10" />
-          <motion.h2 initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl text-balance">
+          <motion.h2 initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="text-3xl font-bold tracking-tight text-base-primary sm:text-4xl md:text-5xl text-balance">
             Ready to supercharge your <span className="gradient-text-animated">workspace?</span>
           </motion.h2>
-          <p className="max-w-xl mx-auto mt-4 text-base text-slate-400 sm:text-lg text-balance">
+          <p className="max-w-xl mx-auto mt-4 text-base text-base-text sm:text-lg text-balance">
             Join the movement of teams building faster, smarter, and fully offline. Launch your first workspace in seconds.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
@@ -693,7 +694,7 @@ function CTA() {
               Launch Workspace
               <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
             </a>
-            <a href="#features" className="inline-flex items-center gap-2 px-7 py-3.5 text-base font-semibold text-white rounded-2xl glass hover:bg-white/10 transition-all hover:scale-105">
+            <a href="#features" className="inline-flex items-center gap-2 px-7 py-3.5 text-base font-semibold text-base-primary rounded-2xl glass hover:bg-white/10 transition-all hover:scale-105">
               View Features
             </a>
           </div>
@@ -717,6 +718,7 @@ const footerSocials = [
 ]
 
 function Footer() {
+  const year = new Date().getFullYear();
   return (
     <footer className="relative border-t border-white/10 bg-white/[0.02]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
@@ -733,7 +735,7 @@ function Footer() {
             </p>
             <div className="flex gap-3 mt-5">
               {footerSocials.map((s, i) => (
-                <a key={i} href={s.href} className="p-2 rounded-lg glass text-slate-400 hover:text-white hover:bg-white/10 transition-colors">
+                <a key={i} href={s.href} className="p-2 rounded-lg glass text-slate-400 hover:text-base-primary hover:bg-white/10 transition-colors">
                   <s.icon className="w-4 h-4" />
                 </a>
               ))}
@@ -741,11 +743,11 @@ function Footer() {
           </div>
           {Object.entries(footerNav).map(([title, items]) => (
             <div key={title}>
-              <h4 className="text-sm font-semibold text-white mb-3">{title}</h4>
+              <h4 className="text-sm font-semibold text-base-primary mb-3">{title}</h4>
               <ul className="space-y-2">
                 {items.map((item) => (
                   <li key={item}>
-                    <a href={`#${item.toLowerCase().split(' ')[0]}`} className="text-sm text-slate-400 hover:text-white transition-colors">{item}</a>
+                    <a href={`#${item.toLowerCase().split(' ')[0]}`} className="text-sm text-slate-400 hover:text-base-primary transition-colors">{item}</a>
                   </li>
                 ))}
               </ul>
@@ -753,14 +755,14 @@ function Footer() {
           ))}
         </div>
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-12 pt-8 border-t border-white/10">
-          <p className="text-xs text-slate-500">© 2026 WorkFlow Pro. All rights reserved.</p>
+          <p className="text-xs text-slate-500">© {year} WorkFlow Pro. All rights reserved.</p>
           <p className="flex items-center gap-1.5 text-xs text-slate-500">
-            Built with <Heart className="w-3 h-3 text-pink-500 fill-pink-500/30" /> for modern teams
+            Built with <Heart className="w-3 h-3 text-pink-500 fill-pink-500/30" /> for Muhammad Arham Sanaullah
           </p>
           <div className="flex gap-4 text-xs text-slate-500">
-            <a href="#" className="hover:text-white transition-colors">Privacy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms</a>
-            <a href="#" className="hover:text-white transition-colors">Cookies</a>
+            <a href="#" className="hover:text-base-primary transition-colors">Privacy</a>
+            <a href="#" className="hover:text-base-primary transition-colors">Terms</a>
+            <a href="#" className="hover:text-base-primary transition-colors">Cookies</a>
           </div>
         </div>
       </div>
@@ -772,7 +774,7 @@ function Footer() {
 function LandingPag() {
   return (
     <ThemeProvider>
-      <div className="min-h-screen bg-ink-950 text-white overflow-x-hidden">
+      <div className="min-h-screen bg-ink-950 text-base-primary overflow-x-hidden">
         <Navbar />
         <main>
           <Hero />

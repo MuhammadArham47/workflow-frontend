@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { userAuth } from "../../context/Auths";
 import { useNavigate } from "react-router-dom";
+import { initTheme } from "../../utils/theme";
+// import "../../styles/theme.css";
 
 
 const ROLES = ["Owner", "Admin", "Member", "Viewer"];
@@ -90,6 +92,11 @@ function AuthPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // localStorage se "wf-theme" parh kar light/dark apply karta hai
+    initTheme();
+  }, []);
+
+  useEffect(() => {
     const saved = localStorage.getItem("wf-remember");
     if (saved) {
       try {
@@ -125,7 +132,7 @@ function AuthPage() {
       setLoading(false);
       toast.success(`Logged in as ${displayName}`, {
         description: "Logged in successfully! Redirecting to Workspace...",
-        icon: <CheckCircle2 className="h-4 w-4 text-emerald-400" />,
+        icon: <CheckCircle2 className="h-4 w-4 text-[var(--color-success)]" />,
       });
     }, 1400);
   };
@@ -185,29 +192,29 @@ function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
+    <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text-primary)] transition-colors duration-300">
       <Toaster
         theme="dark"
         position="top-center"
         toastOptions={{
           style: {
-            background: "rgba(15, 23, 42, 0.9)",
-            border: "1px solid rgb(30 41 59)",
-            color: "#e2e8f0",
+            background: "var(--color-bg-secondary)",
+            border: "1px solid var(--color-border)",
+            color: "var(--color-text-primary)",
             backdropFilter: "blur(12px)",
           },
         }}
       />
       <main className="relative flex min-h-screen items-center justify-center overflow-hidden px-4 py-10 sm:px-8">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-32 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-indigo-600/20 blur-3xl" />
-          <div className="absolute -bottom-40 -left-24 h-96 w-96 rounded-full bg-purple-600/15 blur-3xl" />
-          <div className="absolute -right-24 top-1/3 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl" />
+          <div className="absolute -top-32 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-[var(--blur-accent-1)] blur-3xl" />
+          <div className="absolute -bottom-40 -left-24 h-96 w-96 rounded-full bg-[var(--blur-accent-2)] blur-3xl" />
+          <div className="absolute -right-24 top-1/3 h-72 w-72 rounded-full bg-[var(--blur-accent-3)] blur-3xl" />
         </div>
 
         <div className="relative z-10 w-full max-w-md">
           <div className="mb-6 flex items-center justify-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 shadow-lg shadow-indigo-600/40">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--color-accent-from)] to-[var(--color-accent-to)] shadow-lg shadow-[var(--shadow-accent)]">
               <Workflow className="h-5 w-5 text-white" />
             </div>
             <span className="text-xl font-bold tracking-tight">WorkFlow Pro</span>
@@ -215,7 +222,7 @@ function AuthPage() {
 
           <h1 className="text-center text-2xl font-bold leading-snug tracking-tight sm:text-3xl">
             Supercharge your team's workspace with{" "}
-            <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-[var(--color-accent-light-from)] to-[var(--color-accent-light-to)] bg-clip-text text-transparent">
               offline-first speed.
             </span>
           </h1>
@@ -224,18 +231,18 @@ function AuthPage() {
             {FEATURES.map((f) => (
               <div
                 key={f.title}
-                className="group flex flex-col items-center gap-1.5 rounded-xl border border-slate-800 bg-slate-900/50 px-2 py-3 text-center backdrop-blur transition-all duration-300 hover:border-indigo-500/40"
+                className="group flex flex-col items-center gap-1.5 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-feature)] px-2 py-3 text-center backdrop-blur transition-all duration-300 hover:border-[var(--color-border-hover)]"
               >
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-indigo-500/30 bg-indigo-500/10 text-indigo-400 shadow-[0_0_16px_rgba(99,102,241,0.2)] transition-transform duration-300 group-hover:scale-110">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--color-border-strong)] bg-[var(--blur-accent-3)] text-[var(--color-accent-text)] shadow-[0_0_16px_var(--blur-accent-1)] transition-transform duration-300 group-hover:scale-110">
                   <f.icon className="h-4 w-4" />
                 </div>
-                <p className="text-[11px] font-medium leading-tight text-slate-300">{f.title}</p>
+                <p className="text-[11px] font-medium leading-tight text-[var(--color-text-secondary)]">{f.title}</p>
               </div>
             ))}
           </div>
 
-          <div className="mt-8 rounded-2xl border border-slate-800 bg-slate-900/60 p-6 shadow-2xl shadow-indigo-950/40 backdrop-blur-xl sm:p-8">
-            <div className="grid grid-cols-3 gap-1 rounded-xl border border-slate-800 bg-slate-950/70 p-1">
+          <div className="mt-8 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-secondary)] p-6 shadow-2xl shadow-[var(--shadow-accent-strong)] backdrop-blur-xl sm:p-8">
+            <div className="grid grid-cols-3 gap-1 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-tertiary)] p-1">
               {[
                 { id: "signup", label: "Sign Up" },
                 { id: "login", label: "Log In" },
@@ -247,8 +254,8 @@ function AuthPage() {
                   onClick={() => switchMode(tab.id)}
                   className={`rounded-lg px-3 py-2 text-sm font-medium transition-all duration-300 ${
                     mode === tab.id
-                      ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/30"
-                      : "text-slate-400 hover:text-slate-200"
+                      ? "bg-gradient-to-r from-[var(--color-accent-from)] to-[var(--color-accent-to)] text-white shadow-lg shadow-[var(--shadow-accent)]"
+                      : "text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]"
                   }`}
                 >
                   {tab.label}
@@ -261,7 +268,7 @@ function AuthPage() {
               {mode === "login" && "Welcome back"}
               {mode === "demo" && "Fast Hackathon Demo Login"}
             </h2>
-            <p className="mt-1 text-sm text-slate-400">
+            <p className="mt-1 text-sm text-[var(--color-text-muted)]">
               {mode === "signup" && "Set up your account and launch in seconds."}
               {mode === "login" && "Log in to continue to your workspace."}
               {mode === "demo" && "One click — pick a mock user and jump right in."}
@@ -275,7 +282,7 @@ function AuthPage() {
                     type="button"
                     disabled={loading}
                     onClick={() => handleDemoLogin(u)}
-                    className="group flex w-full items-center gap-3 rounded-xl border border-slate-800 bg-slate-950/60 p-3 text-left transition-all duration-300 hover:-translate-y-0.5 hover:border-indigo-500/50 hover:shadow-lg hover:shadow-indigo-600/20 disabled:opacity-60"
+                    className="group flex w-full items-center gap-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-tertiary)] p-3 text-left transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--color-border-hover)] hover:shadow-lg hover:shadow-[var(--blur-accent-1)] disabled:opacity-60"
                   >
                     <div
                       className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${u.gradient} text-xs font-bold text-white transition-transform duration-300 group-hover:scale-110`}
@@ -284,15 +291,15 @@ function AuthPage() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-semibold">{u.name}</p>
-                      <p className="truncate text-xs text-slate-400">{u.role}</p>
+                      <p className="truncate text-xs text-[var(--color-text-muted)]">{u.role}</p>
                     </div>
-                    <span className="rounded-full border border-slate-700 bg-slate-800/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-300">
+                    <span className="rounded-full border border-[var(--color-border)] bg-[var(--color-bg-tertiary)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
                       {u.badge}
                     </span>
-                    <Sparkles className="h-4 w-4 shrink-0 text-indigo-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                    <Sparkles className="h-4 w-4 shrink-0 text-[var(--color-accent-text)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   </button>
                 ))}
-                <p className="pt-2 text-center text-xs text-slate-500">
+                <p className="pt-2 text-center text-xs text-[var(--color-text-faint)]">
                   Clicking a card auto-fills credentials and logs in instantly.
                 </p>
               </div>
@@ -300,72 +307,72 @@ function AuthPage() {
               <form onSubmit={handleSubmit} className="mt-6 space-y-4" noValidate>
                 {mode === "signup" && (
                   <div>
-                    <label htmlFor="name" className="mb-1.5 block text-xs font-medium text-slate-300">
+                    <label htmlFor="name" className="mb-1.5 block text-xs font-medium text-[var(--color-text-secondary)]">
                       Full Name
                     </label>
                     <div className="relative">
-                      <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                      <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-text-faint)]" />
                       <input
                         id="name"
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Ada Lovelace"
-                        className="w-full rounded-lg border border-slate-800 bg-slate-950/70 py-2.5 pl-10 pr-3 text-sm text-slate-100 placeholder-slate-500 outline-none transition-all duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30"
+                        className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-tertiary)] py-2.5 pl-10 pr-3 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-faint)] outline-none transition-all duration-200 focus:border-[var(--color-accent-solid)] focus:ring-2 focus:ring-[var(--blur-accent-3)]"
                       />
                     </div>
-                    {errors["name"] && <p className="mt-1 text-xs text-red-400">{errors["name"]}</p>}
+                    {errors["name"] && <p className="mt-1 text-xs text-[var(--color-danger)]">{errors["name"]}</p>}
                   </div>
                 )}
 
                 <div>
-                  <label htmlFor="email" className="mb-1.5 block text-xs font-medium text-slate-300">
+                  <label htmlFor="email" className="mb-1.5 block text-xs font-medium text-[var(--color-text-secondary)]">
                     Email Address
                   </label>
                   <div className="relative">
-                    <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                    <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-text-faint)]" />
                     <input
                       id="email"
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="you@company.com"
-                      className="w-full rounded-lg border border-slate-800 bg-slate-950/70 py-2.5 pl-10 pr-3 text-sm text-slate-100 placeholder-slate-500 outline-none transition-all duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30"
+                      className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-tertiary)] py-2.5 pl-10 pr-3 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-faint)] outline-none transition-all duration-200 focus:border-[var(--color-accent-solid)] focus:ring-2 focus:ring-[var(--blur-accent-3)]"
                     />
                   </div>
-                  {errors["email"] && <p className="mt-1 text-xs text-red-400">{errors["email"]}</p>}
+                  {errors["email"] && <p className="mt-1 text-xs text-[var(--color-danger)]">{errors["email"]}</p>}
                 </div>
 
                 <div>
-                  <label htmlFor="password" className="mb-1.5 block text-xs font-medium text-slate-300">
+                  <label htmlFor="password" className="mb-1.5 block text-xs font-medium text-[var(--color-text-secondary)]">
                     Password
                   </label>
                   <div className="relative">
-                    <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                    <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-text-faint)]" />
                     <input
                       id="password"
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full rounded-lg border border-slate-800 bg-slate-950/70 py-2.5 pl-10 pr-10 text-sm text-slate-100 placeholder-slate-500 outline-none transition-all duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30"
+                      className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-tertiary)] py-2.5 pl-10 pr-10 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-faint)] outline-none transition-all duration-200 focus:border-[var(--color-accent-solid)] focus:ring-2 focus:ring-[var(--blur-accent-3)]"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword((s) => !s)}
                       aria-label={showPassword ? "Hide password" : "Show password"}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 transition-colors hover:text-slate-300"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-faint)] transition-colors hover:text-[var(--color-text-secondary)]"
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
-                  {errors["password"] && <p className="mt-1 text-xs text-red-400">{errors["password"]}</p>}
+                  {errors["password"] && <p className="mt-1 text-xs text-[var(--color-danger)]">{errors["password"]}</p>}
                 </div>
 
                 {mode === "signup" && (
                   <>
                     <div>
-                      <label className="mb-1.5 block text-xs font-medium text-slate-300">
+                      <label className="mb-1.5 block text-xs font-medium text-[var(--color-text-secondary)]">
                         Initial Role
                       </label>
                       <div className="grid grid-cols-4 gap-2">
@@ -376,8 +383,8 @@ function AuthPage() {
                             onClick={() => setRole(r)}
                             className={`rounded-lg border px-2 py-2 text-xs font-medium transition-all duration-200 ${
                               role === r
-                                ? "border-indigo-500/60 bg-indigo-500/15 text-indigo-300 shadow-[0_0_16px_rgba(99,102,241,0.25)]"
-                                : "border-slate-800 bg-slate-950/60 text-slate-400 hover:border-slate-700 hover:text-slate-200"
+                                ? "border-[var(--color-border-strong)] bg-[var(--blur-accent-3)] text-[var(--color-accent-text)] shadow-[0_0_16px_var(--blur-accent-1)]"
+                                : "border-[var(--color-border)] bg-[var(--color-bg-tertiary)] text-[var(--color-text-muted)] hover:border-[var(--color-border-muted)] hover:text-[var(--color-text-secondary)]"
                             }`}
                           >
                             {r}
@@ -387,22 +394,22 @@ function AuthPage() {
                     </div>
 
                     <div>
-                      <label htmlFor="workspace" className="mb-1.5 block text-xs font-medium text-slate-300">
+                      <label htmlFor="workspace" className="mb-1.5 block text-xs font-medium text-[var(--color-text-secondary)]">
                         Workspace Name
                       </label>
                       <div className="relative">
-                        <Building2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                        <Building2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-text-faint)]" />
                         <input
                           id="workspace"
                           type="text"
                           value={workspace}
                           onChange={(e) => setWorkspace(e.target.value)}
                           placeholder="My Workspace"
-                          className="w-full rounded-lg border border-slate-800 bg-slate-950/70 py-2.5 pl-10 pr-3 text-sm text-slate-100 placeholder-slate-500 outline-none transition-all duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30"
+                          className="w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-tertiary)] py-2.5 pl-10 pr-3 text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-faint)] outline-none transition-all duration-200 focus:border-[var(--color-accent-solid)] focus:ring-2 focus:ring-[var(--blur-accent-3)]"
                         />
                       </div>
                       {errors["workspace"] && (
-                        <p className="mt-1 text-xs text-red-400">{errors["workspace"]}</p>
+                        <p className="mt-1 text-xs text-[var(--color-danger)]">{errors["workspace"]}</p>
                       )}
                     </div>
                   </>
@@ -410,18 +417,18 @@ function AuthPage() {
 
                 {mode === "login" && (
                   <div className="flex items-center justify-between">
-                    <label className="flex cursor-pointer items-center gap-2 text-xs text-slate-400">
+                    <label className="flex cursor-pointer items-center gap-2 text-xs text-[var(--color-text-muted)]">
                       <input
                         type="checkbox"
                         checked={rememberMe}
                         onChange={(e) => setRememberMe(e.target.checked)}
-                        className="h-4 w-4 rounded border-slate-700 bg-slate-900 accent-indigo-500"
+                        className="h-4 w-4 rounded border-[var(--color-border-muted)] bg-[var(--color-bg-secondary)] accent-[var(--color-accent-solid)]"
                       />
                       Remember me
                     </label>
                     <button
                       type="button"
-                      className="text-xs font-medium text-indigo-400 transition-colors hover:text-indigo-300"
+                      className="text-xs font-medium text-[var(--color-accent-text)] transition-colors hover:text-[var(--color-accent-light-from)]"
                     >
                       Forgot password?
                     </button>
@@ -431,7 +438,7 @@ function AuthPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="group relative mt-2 flex w-full items-center justify-center gap-2 overflow-hidden rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-600/40 transition-all duration-300 hover:shadow-xl hover:shadow-purple-600/40 hover:brightness-110 disabled:opacity-70"
+                  className="group relative mt-2 flex w-full items-center justify-center gap-2 overflow-hidden rounded-lg bg-gradient-to-r from-[var(--color-accent-from)] to-[var(--color-accent-to)] py-3 text-sm font-semibold text-white shadow-lg shadow-[var(--shadow-accent)] transition-all duration-300 hover:shadow-xl hover:shadow-[var(--shadow-accent-strong)] hover:brightness-110 disabled:opacity-70"
                 >
                   {loading ? (
                     <>
@@ -446,22 +453,22 @@ function AuthPage() {
                 </button>
 
                 {mode === "signup" && (
-                  <p className="text-center text-xs text-slate-500">
-                    You'll join as <span className="font-medium text-indigo-300">{role}</span> of{" "}
-                    <span className="font-medium text-slate-300">{workspace || "My Workspace"}</span>.
+                  <p className="text-center text-xs text-[var(--color-text-faint)]">
+                    You'll join as <span className="font-medium text-[var(--color-accent-text)]">{role}</span> of{" "}
+                    <span className="font-medium text-[var(--color-text-secondary)]">{workspace || "My Workspace"}</span>.
                   </p>
                 )}
               </form>
             )}
 
             {mode !== "demo" && (
-              <div className="mt-5 border-t border-slate-800 pt-4 text-center">
+              <div className="mt-5 border-t border-[var(--color-border)] pt-4 text-center">
                 <button
                   type="button"
                   onClick={() => switchMode("demo")}
-                  className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 transition-colors hover:text-indigo-300"
+                  className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-accent-text)]"
                 >
-                  <Zap className="h-3.5 w-3.5 text-indigo-400" />
+                  <Zap className="h-3.5 w-3.5 text-[var(--color-accent-text)]" />
                   Just browsing? Try the Fast Demo Login
                   <ChevronDown className="h-3.5 w-3.5" />
                 </button>
@@ -469,7 +476,7 @@ function AuthPage() {
             )}
           </div>
 
-          <p className="mt-6 text-center text-xs text-slate-600">
+          <p className="mt-6 text-center text-xs text-[var(--color-text-footer)]">
             Simulated authentication — no data leaves your browser.
           </p>
         </div>
