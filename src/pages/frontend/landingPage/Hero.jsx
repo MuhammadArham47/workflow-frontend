@@ -189,7 +189,7 @@ function AppPreview() {
         <div className="flex-1 flex justify-center">
           <div className="flex items-center gap-2 px-3 py-1 text-xs text-slate-400 rounded-md bg-white/5">
             <Search className="w-3 h-3" />
-            workflow.pro/dashboard
+            Dashboard
           </div>
         </div>
       </div>
